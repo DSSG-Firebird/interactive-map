@@ -1,0 +1,46 @@
+<!--
+html { background: #fff; color: #000;}
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td
+ { margin: 0; padding: 0; }
+body { font-family: "Lucida Grande", Geneva, Arial, Verdana, sans-serif; font-size: 9pt; }
+#header { background: url('img/header/bgHeader.jpg') center top repeat-x; height: 150px; position: relative; top: -2px; left: 0px; z-index: 100; }
+.hiddenItem { display: none; }
+#logoWrapper { background: url('img/header/bgHeader.jpg') center top no-repeat; height: 125px; margin: 2px auto 0 auto; left: 0px; }
+#logo { background: url('img/header/logo.gif') 0px no-repeat; float: left; margin: 0px 90px; padding: 20px 0px; width: 200px; }
+#logo a { cursor: pointer; display: block; height: 0px !important; margin: 16px 0 0 0; overflow: hidden; padding: 0; padding-top:70px; text-decoration: none; width: 160px; }
+#siteLogo { position: absolute; top:46px; left:600px; height:70px; width:400px;  z-index:1500; font-size:30pt; font-style: oblique; font-weight: 900; text-shadow: 0.05em 0.05em 0.05em #333  }
+#utilityNav div a.utility { color: #FFFFFF; text-shadow: 2px 2px 2px #666; }
+.transparent { background: transparent  url('img/header/bgHeader.jpg'); }
+#utilityBar { background: url('img/misc/bgUtilityNav.gif') repeat-x; height: 25px; position: relative; top: 0
+px; left:0px; margin: 0px; padding: 0px; }
+#utilityNav { margin: 0px 40px; padding: 0px; vertical-align: top; position: relative; float:left; white-space: nowrap; }
+#utilityNav #spacefiller { visibility: hidden; display: inline-block; width: 4px }
+#utilityNav div {background: url('img/misc/bgUtilityNavItem.gif') 2px 6px no-repeat; 
+       	color: #957b33; white-space: nowrap; vertical-align: top; font-size: 8.5pt; font-weight: bold;
+       	padding: 5px 5px 1px 10px; display:inline-block; position: relative; top:-6px; text-transform: uppercase; z-index: 250; }
+#utilityNav div #remove { visibility: visible; display: none; position: relative; vertical-align: top; top: 2px; margin-left: 4px; }
+#utilityNav div a { color: #957b33; margin: 0px; text-decoration: none; }
+#utilityNav div a:hover { color: #000; }
+#utilityNav div a b { color: #000; }
+#utilityNav div b a { color: #000; }
+.clearfix:after { clear: both; content: "."; display: block; height: 0; visibility: hidden; }
+.clearfix { display: inline-table; }
+.clearfix { display: block; }.roundedCorners { background: url('/custom/dragndropgt/img/misc/bgRoundedCornersTopLeft.png') top left repeat-x;
+  background-image: -moz-linear-gradient(#EEEEEE, #FFFFFF 30px, #FFFFFF);
+  background-image: -webkit-gradient(linear, 0 0, 0 30, from(#EEEEEE), to(#FFFFFF));
+  -moz-border-radius: 5px; -webkit-border-radius: 5px; -khtml-border-radius: 5px;
+  border: 1px solid #eee;  -moz-border-colors: #eee #f0f0f0;
+ margin: 0 0 31px 0; }
+#content { margin: 60px; text-align: center; }
+#content div.roundedCorners .topbar .controls { visibility: hidden; }
+#content div.roundedCorners .topbar:hover .controls {visibility: visible; }
+#content div.roundedCorners .topbar h2 { position: relative; margin: 0; padding: 2px 10px; min-height: 22px; vertical-align: top; text-transform: uppercase; white-space: pre; cursor: pointer; }
+.roundedCorners .body { background: #fff;
+   margin: 0; padding: 0 10px; z-index: 0;
+   }
+   margin: 0; padding: 0; min-height: 0px; }
+.roundedCorners .footer p { background: url('/custom/dragndropgt/images/misc/bgRoundedCornersBottomRight.gif') bottom right no-repeat; display: block; margin: 0px; height: 5px; }
+.center { text-align: center; }
+#mainbox { width: 400px; margin-left: auto; margin-right: auto; }
+
+-->

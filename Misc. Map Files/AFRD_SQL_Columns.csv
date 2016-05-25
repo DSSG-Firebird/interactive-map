@@ -1,0 +1,11 @@
+Columns,Description
+incident_n,AFRD Incident Number
+in_fsaf_yn,All values are “fire” - for mapping purposes
+location,"Address, from AFRD Incident data"
+Property_u,"Property Usage, from AFRD Incident data"
+Incident_d,"Incident date, from AFRD Incident data"
+Lat_y,"Latitude, from AFRD Incident data"
+Long_x,"Longitude, from AFRD Incident data"
+NPU,NPU
+District,Council District
+Battalion,AFRD Battalion

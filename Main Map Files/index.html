@@ -1,0 +1,2113 @@
+<!--  ##### code copyright July 2015 
+    ##### written by Michael Madaio, with Oliver Haimson, Xiang Cheng and Wenwen Zhang
+    ##### on behalf of Data Science for Social Good - Atlanta
+    ##### for Atlanta Fire Rescue Department
+    ##### contact: mmadaio@andrew.cmu.edu
+-->
+
+
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>AFRD Inspection Map</title>
+
+        <script src='https://api.tiles.mapbox.com/mapbox.js/v2.2.1/mapbox.js'></script>
+        <link href='https://api.tiles.mapbox.com/mapbox.js/v2.2.1/mapbox.css' rel='stylesheet'/>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+        <script src="js/moment.js" type="text/javascript"></script>
+        
+        <link rel="stylesheet" href="css/iThing.css" type="text/css" />
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/prism.css">
+        <link rel="stylesheet" href="css/chosen.css">
+
+</head>
+
+
+
+<body>
+
+<style>
+
+    body { 
+        margin:0; 
+        padding:0; 
+        width:100%; 
+        height:100%; 
+    }
+
+    #map { 
+        position:absolute; 
+        top:0; 
+        bottom:0; 
+        width:100%; 
+        height:100%;}
+
+    svg {
+        position: relative;
+    }
+
+    circle {
+        cursor: pointer;
+    }
+
+    path {
+        opacity: .5;
+        fill: transparent;
+        stroke-width: 3px;
+        stroke-opacity:.9;
+        stroke: #505050;
+    }
+
+    .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: white;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+    }
+    .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+    }
+
+    #info_text {
+        background-color: rgba(204, 204, 204, 0.7);
+        position:relative;
+        float:right;
+        margin-right: 10px;
+        margin-top: 70px;
+        line-height: 1;
+        padding: 12px;
+        color: #000000;
+        border-radius: 2px;
+        z-index:1000;
+    }
+
+    #d3_tip {
+        font-weight: bold;
+    }
+
+
+    #d3_text {
+        position:relative;
+        margin-top: -10px;
+        color: #000000;
+        z-index:1000;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .vertical_line {
+        border-radius: 7px;
+        margin-left: -5px;
+        padding-left: 10px; 
+        position:relative;
+    }
+
+    #fire_line {
+        border-left: thick solid #AA3939;
+    }
+
+    #no_line {
+        margin-top: 0px;
+        margin-bottom: -10px;
+    }
+
+    #insp_line {
+        border-left: thick solid #4CAF50;
+    }
+
+    #potential_line {
+        border-left: thick solid #1F77B4;
+    }
+
+    .filter_options {
+        background-color: rgba(204, 204, 204, 0.7);
+        border-radius: 5px;
+        position: absolute;
+        margin-top: 5px;
+        margin-left: 10px;
+        width: 370px;
+        padding-top: 15px;
+        padding-bottom: 25px;
+        padding-left: 15px;
+        height: auto;
+    }
+
+    hr {
+       display: block;
+       position: relative;
+       padding: 0;
+       margin: 8px auto;
+       margin-top: 15px;
+       height: 0;
+       width: 360px;
+       margin-left:-2px;
+       max-height: 0;
+       font-size: 1px;
+       line-height: 0;
+       clear: both;
+       border: none;
+       border-top: 1px solid #aaaaaa;
+       border-bottom: 1px solid #ffffff;
+    }
+
+    .type_filter{
+        margin-top: 30px;
+    }
+
+    #fire_filter {
+        margin-top: 5px;
+    }
+
+    #inspection_filter {
+        margin-top: 15px;
+    }
+
+    #potential_filter {
+        margin-top: 15px;
+    }
+
+    .filter_button {
+        float:left;
+        height:20px;
+        width:20px;
+    }
+
+    .slider {
+        width:290px;
+        margin-top:15px;
+        margin-left:28px;
+    }
+
+    input {
+        margin-bottom: 15px;
+    }
+
+    #fire_button {
+        margin-bottom: 5px;
+    }
+
+    #insp_button {
+        margin-bottom: 5px;
+    }
+
+    #potential_button {
+        margin-bottom: 5px;
+    }
+
+    .label_text {
+        float:left;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 0px;
+    }
+
+    #radio {
+        float:left;
+        font-size: 18px;
+        font-weight: bold;
+        padding-top: 7px;
+        padding-right: 7px;
+        padding-left: 10px;
+        border-radius: 5px;
+        position:relative;
+        margin-right: 0px;
+    }
+
+    #radio2 {
+        margin-left: 43px;
+    }
+
+    #radio4 {
+        margin-left: 100px;
+    }
+
+    button {
+        margin-top: 5px;
+        margin-left: 120px;
+        margin-bottom: -10px;
+        background-color: white;
+        border-radius: 5px;
+    }
+
+    #risk_filter_div {
+        position:relative;
+        float:left;
+        border-radius: 5px;
+        margin-top:10px;
+        margin-left: 5px;
+    }
+
+    .risk_text {
+        display: inline-block;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+</style>
+
+
+
+<div id='map'></div>
+
+
+<div class="filter_options">
+
+
+    <div class="vertical_line" id="fire_line">
+        <div class="type_filter" id="fire_filter">
+            <input class="filter_button" id="fire_button" name="typeFilter" value="fire" type="checkbox" checked="checked"><p class="label_text" id="fire_label">Fire Incidents</p></input>
+                <select data-placeholder="Choose a Fire Incident Type..." id="property_usage_button" class="chosen-select filter_button" multiple style="width:350px;" tabindex="4">
+
+        <!-- We generated these using a Python script - "DropdownWriter.py", using the csv for the different Types. You may want to replace the fixed numbers here with a <span> that can be updated as the main SQL database gets updated. 
+        -->
+         <option value="NON-RESIDENTIAL">NON-RESIDENTIAL (656)</option>
+         <option value="1 OR 2 FAMILY DWELLING">1 OR 2 FAMILY DWELLING (1231)</option>
+         <option value="24 HR NURSING HOME, 4 OR MORE">24 HR NURSING HOME, 4 OR MORE (3)</option>
+         <option value="ADULT EDUCATION CTR, COLLEGE">ADULT EDUCATION CTR, COLLEGE (1)</option>
+         <option value="AIRPORT TERMINAL">AIRPORT TERMINAL (2)</option>
+         <option value="ALCOHOL/SUBSTNCE ABUSE RECOVRY">ALCOHOL/SUBSTNCE ABUSE RECOVRY (1)</option>
+         <option value="ASSEMBLY/NOT DETERMINED">ASSEMBLY/NOT DETERMINED (12)</option>
+         <option value="AUDITORIUM, HALL">AUDITORIUM, HALL (1)</option>
+         <option value="BARRACKS, DORMITORY">BARRACKS, DORMITORY (1)</option>
+         <option value="BOARDING/ROOMING HOUSES">BOARDING/ROOMING HOUSES (20)</option>
+         <option value="BUSINESS OFFICE">BUSINESS OFFICE (16)</option>
+         <option value="CHURCH, CHAPEL">CHURCH, CHAPEL (8)</option>
+         <option value="CLINICS, DR OFFICES">CLINICS, DR OFFICES (1)</option>
+         <option value="CLUBS/NOT DETERMINED">CLUBS/NOT DETERMINED (2)</option>
+         <option value="CONSTRUCTION SITE">CONSTRUCTION SITE (1)</option>
+         <option value="CONVENIENCE STORE">CONVENIENCE STORE (11)</option>
+         <option value="DAY CARE, IN COMMERCL PROPRTY">DAY CARE, IN COMMERCL PROPRTY (2)</option>
+         <option value="DOCTOR, DENTIST OFFICE">DOCTOR, DENTIST OFFICE (1)</option>
+         <option value="DORMITORY TYPE RESID, OTHER">DORMITORY TYPE RESID, OTHER (9)</option>
+         <option value="DUMP, SANITARY LANDFILL">DUMP, SANITARY LANDFILL (2)</option>
+         <option value="EATING, DRINKING PLACES">EATING, DRINKING PLACES (5)</option>
+         <option value="EDUCATIONAL/NOT DETERMINED">EDUCATIONAL/NOT DETERMINED (3)</option>
+         <option value="ELEMENTARY SCHOOL">ELEMENTARY SCHOOL (1)</option>
+         <option value="FIRE STATIONS">FIRE STATIONS (1)</option>
+         <option value="FIXED USE RECREATION PLACES">FIXED USE RECREATION PLACES (1)</option>
+         <option value="FOOD & BEVRG SALES, GROC STORE">FOOD & BEVRG SALES, GROC STORE (8)</option>
+         <option value="FOREST, TIMBERLAND, WOODLAND">FOREST, TIMBERLAND, WOODLAND (4)</option>
+         <option value="GAS DISTRIBUTION">GAS DISTRIBUTION (2)</option>
+         <option value="GENERAL RETAIL">GENERAL RETAIL (3)</option>
+         <option value="GRADED PLOTS">GRADED PLOTS (4)</option>
+         <option value="GYMNASIUM, BALLROOM">GYMNASIUM, BALLROOM (3)</option>
+         <option value="HIGH SCHL/JR HIGH/MIDDLE SCHL">HIGH SCHL/JR HIGH/MIDDLE SCHL (4)</option>
+         <option value="HIGHWAY OR DIVIDED HIGHWAY">HIGHWAY OR DIVIDED HIGHWAY (1)</option>
+         <option value="HOSPITAL, MEDICAL OR PSYCH">HOSPITAL, MEDICAL OR PSYCH (3)</option>
+         <option value="HOTEL/MOTEL, COMMERCIAL">HOTEL/MOTEL, COMMERCIAL (22)</option>
+         <option value="INDUSTRIAL PLANT YARD">INDUSTRIAL PLANT YARD (3)</option>
+         <option value="JAIL, PRISON (NOT JUVENILE)">JAIL, PRISON (NOT JUVENILE) (7)</option>
+         <option value="LAUNDRY, DRY-CLEANING">LAUNDRY, DRY-CLEANING (6)</option>
+         <option value="LIBRARY">LIBRARY (1)</option>
+         <option value="MANUFACTURING, PROCESSING">MANUFACTURING, PROCESSING (14)</option>
+         <option value="MERCANTILE, BUSINESS">MERCANTILE, BUSINESS (20)</option>
+         <option value="MINE OR QUARRY">MINE OR QUARRY (1)</option>
+         <option value="MOTOR VEH/BOAT SALES,SVC,REPAI">MOTOR VEH/BOAT SALES,SVC,REPAI (8)</option>
+         <option value="MULTI-FAMILY DWELLINGS">MULTI-FAMILY DWELLINGS (655)</option>
+         <option value="NIGHTCLUB">NIGHTCLUB (5)</option>
+         <option value="NONE">NONE (23)</option>
+         <option value="OPEN LAND, FIELD">OPEN LAND, FIELD (26)</option>
+         <option value="OUTBUILDING OR SHED">OUTBUILDING OR SHED (17)</option>
+         <option value="OUTBUILDING, PROTECTIVE SHELTR">OUTBUILDING, PROTECTIVE SHELTR (3)</option>
+         <option value="OUTSIDE MATERIAL STORAGE AREA">OUTSIDE MATERIAL STORAGE AREA (8)</option>
+         <option value="OUTSIDE OR SPEC PROPERTY">OUTSIDE OR SPEC PROPERTY (34)</option>
+         <option value="PARKG GARAGE (DETACHED RESD)">PARKG GARAGE (DETACHED RESD) (8)</option>
+         <option value="PARKG GARAGE, GENERAL VEH">PARKG GARAGE, GENERAL VEH (24)</option>
+         <option value="PERSONL SVC, BARBER/BEAUTY SHP">PERSONL SVC, BARBER/BEAUTY SHP (1)</option>
+         <option value="PLAYGROUND">PLAYGROUND (1)</option>
+         <option value="POST OFFICE OR MAILING FIRMS">POST OFFICE OR MAILING FIRMS (1)</option>
+         <option value="PROFESSIONAL SUPPLIES, SVCS">PROFESSIONAL SUPPLIES, SVCS (1)</option>
+         <option value="PUBLIC OR GOVT, OTHER">PUBLIC OR GOVT, OTHER (4)</option>
+         <option value="RADIO, TV STUDIO">RADIO, TV STUDIO (1)</option>
+         <option value="RAILROAD RIGHT OF WAY">RAILROAD RIGHT OF WAY (3)</option>
+         <option value="RAPID TRANSIT STATION">RAPID TRANSIT STATION (5)</option>
+         <option value="RESIDENIAL / UNDETERMINED">RESIDENIAL / UNDETERMINED (23)</option>
+         <option value="RESIDENTIAL BOARD AND CARE">RESIDENTIAL BOARD AND CARE (5)</option>
+         <option value="RESIDENTL ST, RD OR DRIVEWAY">RESIDENTL ST, RD OR DRIVEWAY (16)</option>
+         <option value="RESTAURANT">RESTAURANT (73)</option>
+         <option value="SCHOOLS, NON-ADULT">SCHOOLS, NON-ADULT (7)</option>
+         <option value="SERVICE STATION, GAS STATION">SERVICE STATION, GAS STATION (3)</option>
+         <option value="SORORITY HOUSE, FRATERNITY HSE">SORORITY HOUSE, FRATERNITY HSE (1)</option>
+         <option value="SPECIALITY SHOP">SPECIALITY SHOP (3)</option>
+         <option value="STADIUM, ARENA">STADIUM, ARENA (2)</option>
+         <option value="STORAGE">STORAGE (14)</option>
+         <option value="STREET, OTHER">STREET, OTHER (21)</option>
+         <option value="TEXTILE, WEARING APPAREL SALES">TEXTILE, WEARING APPAREL SALES (2)</option>
+         <option value="THEATERS,STUDIOS/UNDETERMINED">THEATERS,STUDIOS/UNDETERMINED (3)</option>
+         <option value="UNDETERMINED">UNDETERMINED (14)</option>
+         <option value="VACANT LOT">VACANT LOT (27)</option>
+         <option value="VEHICLE PARKING AREA">VEHICLE PARKING AREA (37)</option>
+         <option value="VEHICLE STORAGE">VEHICLE STORAGE (1)</option>
+         <option value="WAREHOUSE">WAREHOUSE (20)</option>
+                </select>
+
+                <div class="slider" id="fire_slider"></div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="vertical_line" id="insp_line">
+        <div class="type_filter" id="inspection_filter">
+            <input class="filter_button" id="insp_button"  name="typeFilter" value="1" type="checkbox" checked="checked"><p class="label_text" id="inspection_label">Current Inspections</p></input><br>
+
+            <select data-placeholder="Choose an Inspection Type..." id="occup_type_button" class="chosen-select filter_button" multiple style="width:350px;" tabindex="4">
+            <option value="100 OR MORE UNITS, SEASONAL">100 OR MORE UNITS, SEASONAL (3)</option>
+         <option value="100 OR MORE UNITS, YEAR ROUND">100 OR MORE UNITS, YEAR ROUND (30)</option>
+         <option value="20 TO 99 UNITS, SEASONAL USE">20 TO 99 UNITS, SEASONAL USE (1)</option>
+         <option value="20 TO 99 UNITS, YEAR ROUND USE">20 TO 99 UNITS, YEAR ROUND USE (3)</option>
+         <option value="3 THRU 6 UNITS">3 THRU 6 UNITS (3)</option>
+         <option value="7 THRU 20 UNITS">7 THRU 20 UNITS (1)</option>
+         <option value="ALCOHOLIC BEVERAGE STORAGE">ALCOHOLIC BEVERAGE STORAGE (1)</option>
+         <option value="AMUSEMENT CENTER">AMUSEMENT CENTER (2)</option>
+         <option value="APTS,TENEMENTS NOT CLASSIFIED">APTS,TENEMENTS NOT CLASSIFIED (46)</option>
+         <option value="ARENA, STADIUM">ARENA, STADIUM (3)</option>
+         <option value="ASPHALT, COAL PRODUCT MFG">ASPHALT, COAL PRODUCT MFG (1)</option>
+         <option value="AT FLAMMABLE LQD GAS LOAD FAC">AT FLAMMABLE LQD GAS LOAD FAC (1)</option>
+         <option value="AUDITORIUM, CONCERT HALL">AUDITORIUM, CONCERT HALL (5)</option>
+         <option value="BAKERY PRODUCTS MANUFACTURE">BAKERY PRODUCTS MANUFACTURE (9)</option>
+         <option value="BALLROOM, GYMNASIUM">BALLROOM, GYMNASIUM (18)</option>
+         <option value="BANK WITH 1ST STORY BANK FACIL">BANK WITH 1ST STORY BANK FACIL (2)</option>
+         <option value="BARBER, BEAUTY SHOP">BARBER, BEAUTY SHOP (7)</option>
+         <option value="BASIC METAL FORM STORAGE">BASIC METAL FORM STORAGE (1)</option>
+         <option value="BILLIARD CENTER">BILLIARD CENTER (1)</option>
+         <option value="BOWLING ESTABLISHMENT">BOWLING ESTABLISHMENT (3)</option>
+         <option value="BREWERY, MANUFACTURE OF MALT">BREWERY, MANUFACTURE OF MALT (3)</option>
+         <option value="BUS PASSENGER TERMINAL">BUS PASSENGER TERMINAL (2)</option>
+         <option value="BUSINESS SCHOOL">BUSINESS SCHOOL (1)</option>
+         <option value="CANNED BOTTLED FOOD SOFT DRNK">CANNED BOTTLED FOOD SOFT DRNK (1)</option>
+         <option value="CAR WASHING FACILITY">CAR WASHING FACILITY (2)</option>
+         <option value="CARE OF AGED NOT CLASSIFIED">CARE OF AGED NOT CLASSIFIED (4)</option>
+         <option value="CARE OF AGED W/O  NURSING STAF">CARE OF AGED W/O  NURSING STAF (5)</option>
+         <option value="CARE OF AGED WITH NURSING STAF">CARE OF AGED WITH NURSING STAF (9)</option>
+         <option value="CARE OF YOUNG NOT CLASSIFIED">CARE OF YOUNG NOT CLASSIFIED (1)</option>
+         <option value="CEMENT MANUFACTURE">CEMENT MANUFACTURE (1)</option>
+         <option value="CEMETERY">CEMETERY (4)</option>
+         <option value="CHEMICAL PLASTIC STOR NOT CLAS">CHEMICAL PLASTIC STOR NOT CLAS (1)</option>
+         <option value="CHILDREN'S HOME, ORPHANAGE">CHILDREN'S HOME, ORPHANAGE (2)</option>
+         <option value="CHURCH HALL">CHURCH HALL (7)</option>
+         <option value="CHURCH, CHAPEL">CHURCH, CHAPEL (31)</option>
+         <option value="CHURCHES, FUNERAL NOT CLASS">CHURCHES, FUNERAL NOT CLASS (1)</option>
+         <option value="CITY CLUB">CITY CLUB (26)</option>
+         <option value="CLINIC, CLINIC TYPE INFIRMARY">CLINIC, CLINIC TYPE INFIRMARY (6)</option>
+         <option value="CLINICS,DRS. OFFICE, DIALYSIS">CLINICS,DRS. OFFICE, DIALYSIS (1)</option>
+         <option value="CLOTHING ACCESSORIES, SHOE STO">CLOTHING ACCESSORIES, SHOE STO (3)</option>
+         <option value="CLOTHING STORE">CLOTHING STORE (4)</option>
+         <option value="CLUBS NOT CLASSIFIED">CLUBS NOT CLASSIFIED (10)</option>
+         <option value="COLD STORAGE">COLD STORAGE (5)</option>
+         <option value="COLLEGE CLASSROOM BUILDING">COLLEGE CLASSROOM BUILDING (1)</option>
+         <option value="COMMUNIC DEFENSE NOT CLASSIFED">COMMUNIC DEFENSE NOT CLASSIFED (12)</option>
+         <option value="COMPUTER, DATA PROCESSING CNTR">COMPUTER, DATA PROCESSING CNTR (3)</option>
+         <option value="CONCRETE BATCH PLANT">CONCRETE BATCH PLANT (2)</option>
+         <option value="CONSTRUCTION UNOCCUPIED NOT CL">CONSTRUCTION UNOCCUPIED NOT CL (1)</option>
+         <option value="COTTON SPINNING, WEAVING">COTTON SPINNING, WEAVING (1)</option>
+         <option value="COUNTRY CLUB">COUNTRY CLUB (8)</option>
+         <option value="CROPS, ORCHARDS">CROPS, ORCHARDS (1)</option>
+         <option value="DAIRY PRODUCT MANUFACTURE">DAIRY PRODUCT MANUFACTURE (1)</option>
+         <option value="DAY CHILD CARE CENTER">DAY CHILD CARE CENTER (26)</option>
+         <option value="DEPARTMENT STORE">DEPARTMENT STORE (15)</option>
+         <option value="DORMITORIES, NOT CLASSIFIED">DORMITORIES, NOT CLASSIFIED (1)</option>
+         <option value="DRUG, COSMETIC PHARM STORAGE">DRUG, COSMETIC PHARM STORAGE (1)</option>
+         <option value="DRUG, COSMETIC, PHARMACEUTICAL">DRUG, COSMETIC, PHARMACEUTICAL (3)</option>
+         <option value="EATING,DRINKING NOT CLASSIFIED">EATING,DRINKING NOT CLASSIFIED (1)</option>
+         <option value="EDUCATIONAL PROP. NOT CLASS">EDUCATIONAL PROP. NOT CLASS (1)</option>
+         <option value="ELEMENTARY SCHOOL">ELEMENTARY SCHOOL (68)</option>
+         <option value="ENGINEERING, ARCHITECT, TECHNC">ENGINEERING, ARCHITECT, TECHNC (2)</option>
+         <option value="EXHIBITION; EXPOSITION HALL">EXHIBITION; EXPOSITION HALL (12)</option>
+         <option value="FIBER PRODUCTS STORAGE">FIBER PRODUCTS STORAGE (2)</option>
+         <option value="FIRE STATIONS">FIRE STATIONS (9)</option>
+         <option value="FIRE, POLICE, INDUST. COMM CNT">FIRE, POLICE, INDUST. COMM CNT (1)</option>
+         <option value="FLAMMABLE LIQUID DISTRIBUTION">FLAMMABLE LIQUID DISTRIBUTION (1)</option>
+         <option value="FLAMMABLE, COMBUSTIBLE LQD STO">FLAMMABLE, COMBUSTIBLE LQD STO (4)</option>
+         <option value="FOOD INDUSTRIES NOT CLASSIFIED">FOOD INDUSTRIES NOT CLASSIFIED (1)</option>
+         <option value="FOOD, BEVERAGE SALES NOT CLASS">FOOD, BEVERAGE SALES NOT CLASS (19)</option>
+         <option value="FRATERNITY, SORORITY HOUSE">FRATERNITY, SORORITY HOUSE (1)</option>
+         <option value="FREIGHT TERMINAL">FREIGHT TERMINAL (1)</option>
+         <option value="FUNERAL PARLOR, CHAPEL">FUNERAL PARLOR, CHAPEL (8)</option>
+         <option value="FURNITURE STORE">FURNITURE STORE (2)</option>
+         <option value="FURNITURE, FIXTURE, BEDDING MF">FURNITURE, FIXTURE, BEDDING MF (5)</option>
+         <option value="FXD USE AMUSEMNT,NOT CLASSFIED">FXD USE AMUSEMNT,NOT CLASSFIED (2)</option>
+         <option value="GENERAL BUSINESS OFFICE">GENERAL BUSINESS OFFICE (107)</option>
+         <option value="GENERAL ITEM STORAGE NOT CLASS">GENERAL ITEM STORAGE NOT CLASS (1)</option>
+         <option value="GENERAL ITEM STORE NOT CLASSIF">GENERAL ITEM STORE NOT CLASSIF (5)</option>
+         <option value="GENERAL MAINTENACE SHOP NOT EL">GENERAL MAINTENACE SHOP NOT EL (6)</option>
+         <option value="GENERAL VEHICLE PARKING GARAGE">GENERAL VEHICLE PARKING GARAGE (5)</option>
+         <option value="GENERAL WAREHOUSE">GENERAL WAREHOUSE (84)</option>
+         <option value="GLASS CONTAINER MFG">GLASS CONTAINER MFG (1)</option>
+         <option value="GLASS MFG EXCLUDE CONTAINERS">GLASS MFG EXCLUDE CONTAINERS (2)</option>
+         <option value="HARDWARE STORE">HARDWARE STORE (6)</option>
+         <option value="HAZARDOUS CHEMICAL MFG">HAZARDOUS CHEMICAL MFG (8)</option>
+         <option value="HAZARDOUS CHEMICAL STORAGE">HAZARDOUS CHEMICAL STORAGE (1)</option>
+         <option value="HIGH SCHOOL">HIGH SCHOOL (12)</option>
+         <option value="HISTORIC BUILDING">HISTORIC BUILDING (2)</option>
+         <option value="HOME MAINTENANCE SERVICES">HOME MAINTENANCE SERVICES (1)</option>
+         <option value="HOSPITAL, INFIRMARY">HOSPITAL, INFIRMARY (12)</option>
+         <option value="HOTEL, MOTEL, NOT CLASSIFIED">HOTEL, MOTEL, NOT CLASSIFIED (21)</option>
+         <option value="HOUSEHOLD GS&R NOT CLASSIFIED">HOUSEHOLD GS&R NOT CLASSIFIED (11)</option>
+         <option value="INDUSTRIAL CHEMICAL MFG">INDUSTRIAL CHEMICAL MFG (5)</option>
+         <option value="INDUSTRIAL CHEMICAL STORAGE">INDUSTRIAL CHEMICAL STORAGE (1)</option>
+         <option value="IRON, STEEL MANUFACTURE">IRON, STEEL MANUFACTURE (2)</option>
+         <option value="JUNIOR HIGH SCHOOL">JUNIOR HIGH SCHOOL (13)</option>
+         <option value="LARGE VARIETY STORE">LARGE VARIETY STORE (2)</option>
+         <option value="LAUNDRY, DRY CLEANER PICK-UP">LAUNDRY, DRY CLEANER PICK-UP (1)</option>
+         <option value="LAUNDRY, DRY CLEANING PLANT">LAUNDRY, DRY CLEANING PLANT (32)</option>
+         <option value="LEGITIMATE THEATER">LEGITIMATE THEATER (4)</option>
+         <option value="LESS THAN 20 UNITS, YR ROUND">LESS THAN 20 UNITS, YR ROUND (1)</option>
+         <option value="LIBRARY">LIBRARY (3)</option>
+         <option value="LIBRARY, MUSEUM NOT CLASSIFIED">LIBRARY, MUSEUM NOT CLASSIFIED (1)</option>
+         <option value="LIQUOR, BEVERAGE STORE">LIQUOR, BEVERAGE STORE (2)</option>
+         <option value="LIQUOR LICENSE">LIQUOR LICENSE (175)</option>
+         <option value="LP GS BULK PLANT">LP GS BULK PLANT (3)</option>
+         <option value="LUMBERYARD, BLDG MATERIAL STOR">LUMBERYARD, BLDG MATERIAL STOR (3)</option>
+         <option value="LUNCHROOM, DRIVE-IN">LUNCHROOM, DRIVE-IN (3)</option>
+         <option value="MACHINERY MANUFACTURE">MACHINERY MANUFACTURE (1)</option>
+         <option value="MACHINERY STORAGE">MACHINERY STORAGE (1)</option>
+         <option value="MAILING FIRM">MAILING FIRM (1)</option>
+         <option value="MALL">MALL (3)</option>
+         <option value="MANUFACTURING PROCESSING">MANUFACTURING PROCESSING (3)</option>
+         <option value="MANUFACTURING PROP NOT CLASS">MANUFACTURING PROP NOT CLASS (3)</option>
+         <option value="MARKET, GROCERY STORE">MARKET, GROCERY STORE (9)</option>
+         <option value="MEDICAL, RESEARCH, OFFICE">MEDICAL, RESEARCH, OFFICE (1)</option>
+         <option value="MERCANTILE, BUSINESS, OTHERS">MERCANTILE, BUSINESS, OTHERS (1)</option>
+         <option value="METAL PARTS STORAGE">METAL PARTS STORAGE (1)</option>
+         <option value="METAL PRODUCT MANUFACTURE">METAL PRODUCT MANUFACTURE (27)</option>
+         <option value="METAL, METAL PRODUCT NOT CLASS">METAL, METAL PRODUCT NOT CLASS (4)</option>
+         <option value="MIXED, BLENDED, OTHER FIBERS">MIXED, BLENDED, OTHER FIBERS (1)</option>
+         <option value="MOTION PICTURE STUDIO">MOTION PICTURE STUDIO (2)</option>
+         <option value="MOTION PICTURE THEATER">MOTION PICTURE THEATER (7)</option>
+         <option value="MOTOR VEH BOAT NOT CLASSIFIED">MOTOR VEH BOAT NOT CLASSIFIED (66)</option>
+         <option value="MOTOR VEHICLE ACCESSORY SALES">MOTOR VEHICLE ACCESSORY SALES (23)</option>
+         <option value="MOTOR VEHICLE REPAIR">MOTOR VEHICLE REPAIR (186)</option>
+         <option value="MOTOR VEHICLE TRAILER SALES">MOTOR VEHICLE TRAILER SALES (2)</option>
+         <option value="MUSEUM, ART GALLERY">MUSEUM, ART GALLERY (10)</option>
+         <option value="NIGHTCLUB">NIGHTCLUB (106)</option>
+         <option value="NONRESID. SCHOOL NOT CLASSIFED">NONRESID. SCHOOL NOT CLASSIFED (4)</option>
+         <option value="OFFICES NOT CLASSIFIED">OFFICES NOT CLASSIFIED (54)</option>
+         <option value="OTHER MANUFACTURING NOT CLASS">OTHER MANUFACTURING NOT CLASS (1)</option>
+         <option value="OUTSIDE OR SPECIAL PROPERTY">OUTSIDE OR SPECIAL PROPERTY (1)</option>
+         <option value="OVER 20 UNITS">OVER 20 UNITS (35)</option>
+         <option value="PACKAGE PETROLEUM PRODUCTS">PACKAGE PETROLEUM PRODUCTS (1)</option>
+         <option value="PACKAGED FOODSTUFF STORAGE">PACKAGED FOODSTUFF STORAGE (4)</option>
+         <option value="PAINT, VARNISH STORAGE">PAINT, VARNISH STORAGE (3)</option>
+         <option value="PAINT, VARNISH, LACQUER, INK">PAINT, VARNISH, LACQUER, INK (2)</option>
+         <option value="PAPER, PAPER PRODUCTS STORAGE">PAPER, PAPER PRODUCTS STORAGE (4)</option>
+         <option value="PAPER, PULP, PAPERBOARD PROD">PAPER, PULP, PAPERBOARD PROD (1)</option>
+         <option value="PETROLEUM REFINERY, NATL GAS">PETROLEUM REFINERY, NATL GAS (2)</option>
+         <option value="PLASTIC PRODUCT MANUFACTURE">PLASTIC PRODUCT MANUFACTURE (1)</option>
+         <option value="PLAYGROUND">PLAYGROUND (1)</option>
+         <option value="POST OFFICE">POST OFFICE (1)</option>
+         <option value="POTTERY CHINA EARTHENWARE MFG">POTTERY CHINA EARTHENWARE MFG (1)</option>
+         <option value="PRINTING PUBLISHING ALLIED IND">PRINTING PUBLISHING ALLIED IND (7)</option>
+         <option value="PRIVATE SERVICE STATION">PRIVATE SERVICE STATION (2)</option>
+         <option value="PROFESSIONAL SUPP NOT CLASS">PROFESSIONAL SUPP NOT CLASS (13)</option>
+         <option value="PROFESSIONAL SUPPLY SALES">PROFESSIONAL SUPPLY SALES (1)</option>
+         <option value="PUBLIC ASSEMBLY NOT CLASSIFIED">PUBLIC ASSEMBLY NOT CLASSIFIED (2)</option>
+         <option value="PUBLIC SERVICE STATION">PUBLIC SERVICE STATION (174)</option>
+         <option value="RADIO, TV STUDIO">RADIO, TV STUDIO (5)</option>
+         <option value="RADIOACTIVE MATERIAL WORKING">RADIOACTIVE MATERIAL WORKING (1)</option>
+         <option value="RECREATION, HOBBY NOT CLASSIFD">RECREATION, HOBBY NOT CLASSIFD (9)</option>
+         <option value="REHAB CENTER ATTEND BY CHOICE">REHAB CENTER ATTEND BY CHOICE (2)</option>
+         <option value="RESIDENTAIL OCCUP NOT CLASSIFD">RESIDENTAIL OCCUP NOT CLASSIFD (1)</option>
+         <option value="RESIDENTIAL PARKING GARAGE">RESIDENTIAL PARKING GARAGE (1)</option>
+         <option value="RESIDENTIAL SCHOOL CLASSROOM">RESIDENTIAL SCHOOL CLASSROOM (2)</option>
+         <option value="RESIDENTIAL SCHOOL NOT CLASS">RESIDENTIAL SCHOOL NOT CLASS (2)</option>
+         <option value="RESTAURANT">RESTAURANT (782)</option>
+         <option value="ROLLER RINK">ROLLER RINK (2)</option>
+         <option value="ROOM, BOARD, LODGE NOT CLASS">ROOM, BOARD, LODGE NOT CLASS (9)</option>
+         <option value="RUBBER, RUBBER PRODUCT STORAGE">RUBBER, RUBBER PRODUCT STORAGE (3)</option>
+         <option value="RUBBER, RUBBER PRODUCTS MFG">RUBBER, RUBBER PRODUCTS MFG (3)</option>
+         <option value="SANITARY SERVICE">SANITARY SERVICE (2)</option>
+         <option value="SAWMILL, PLANING MILL WOOD PRO">SAWMILL, PLANING MILL WOOD PRO (2)</option>
+         <option value="SCRAP, JUNKYARDS">SCRAP, JUNKYARDS (8)</option>
+         <option value="SELF SERVICE LAUNDRY, DRY CLEA">SELF SERVICE LAUNDRY, DRY CLEA (16)</option>
+         <option value="SMALL VARIETY STORE">SMALL VARIETY STORE (21)</option>
+         <option value="SOFT DRINK, CARBONATED WATER">SOFT DRINK, CARBONATED WATER (1)</option>
+         <option value="SPECIAL STRUCTURE NOT CLASSIFI">SPECIAL STRUCTURE NOT CLASSIFI (1)</option>
+         <option value="SPECIALTY FOOD STORE">SPECIALTY FOOD STORE (1)</option>
+         <option value="SPECIALTY SCHOOL">SPECIALTY SCHOOL (2)</option>
+         <option value="SPECIALTY SHOPS NOT CLASSIFIED">SPECIALTY SHOPS NOT CLASSIFIED (8)</option>
+         <option value="STEAM HEAT DISTRIBUTION">STEAM HEAT DISTRIBUTION (1)</option>
+         <option value="STORAGE PROP NOT CLASSIFIED">STORAGE PROP NOT CLASSIFIED (1)</option>
+         <option value="STREET LEVEL RAIL TERMINAL">STREET LEVEL RAIL TERMINAL (1)</option>
+         <option value="SUPERMARKET">SUPERMARKET (7)</option>
+         <option value="SWITCH YARD, MARSHALLING YARD">SWITCH YARD, MARSHALLING YARD (1)</option>
+         <option value="TAVERN">TAVERN (8)</option>
+         <option value="TELEPHONE EXCHANGE, CENTRL OFF">TELEPHONE EXCHANGE, CENTRL OFF (13)</option>
+         <option value="TEXTILE, WEAR APPAR NOT CLASS">TEXTILE, WEAR APPAR NOT CLASS (7)</option>
+         <option value="THEATER, STUDIO NOT CLASSIFIED">THEATER, STUDIO NOT CLASSIFIED (6)</option>
+         <option value="TOOL SHED">TOOL SHED (1)</option>
+         <option value="TRADE SUPPLY SALES">TRADE SUPPLY SALES (1)</option>
+         <option value="TRADE, BUS SCHOOL NOT CLASS">TRADE, BUS SCHOOL NOT CLASS (1)</option>
+         <option value="UNCLASSIFIED">UNCLASSIFIED (1)</option>
+         <option value="VAR USE AMUSEMENT, NOT CLASS">VAR USE AMUSEMENT, NOT CLASS (3)</option>
+         <option value="VOCATIONAL, TRADE SCHOOL">VOCATIONAL, TRADE SCHOOL (1)</option>
+         <option value="WALLPAPER, PAINT STORE">WALLPAPER, PAINT STORE (3)</option>
+         <option value="WATER SUPPLY SYSTEM">WATER SUPPLY SYSTEM (1)</option>
+         <option value="WOOD PAPER PROD NOT CLASSIFIED">WOOD PAPER PROD NOT CLASSIFIED (1)</option>
+         <option value="WOOD PRODUCTS, FURNITURE STORG">WOOD PRODUCTS, FURNITURE STORG (3)</option>
+         <option value="WOOD, CORK PRODUCTS MFG NO CNT">WOOD, CORK PRODUCTS MFG NO CNT (1)</option>
+         <option value="WOOD, FURNITURE, NOT CLASSIFED">WOOD, FURNITURE, NOT CLASSIFED (6)</option>
+            </select>
+
+            <div class="slider" id="insp_slider"></div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="vertical_line" id="potential_line">
+        <div class="type_filter" id="potential_filter">
+            <input class="filter_button" id="potential_button"  name="typeFilter" value="0" type="checkbox" checked="unchecked"><p class="label_text" id="potential_label">Potential Inspections</p></input><br>
+
+            <select data-placeholder="Choose a Potential Inspection Type..." id="sic_type_button" class="chosen-select filter_button" multiple style="width:350px;" tabindex="4">
+           <option value="AUTO REPAIR,OVERHAUL & GENERAL">AUTO REPAIR,OVERHAUL & GENERAL (321)</option>
+         <option value="AUTO/HOME SUPPLY STORE-RETAIL">AUTO/HOME SUPPLY STORE-RETAIL (28)</option>
+         <option value="AUTOMOBILE BODY & PAINT SHOP">AUTOMOBILE BODY & PAINT SHOP (21)</option>
+         <option value="AUTOMOBILE DEALERS, NEW RETAIL">AUTOMOBILE DEALERS, NEW RETAIL (4)</option>
+         <option value="AUTOMOBILE DEALERS,USED RETAIL">AUTOMOBILE DEALERS,USED RETAIL (55)</option>
+         <option value="AUTOMOBILE PARTS, WHOLESALE">AUTOMOBILE PARTS, WHOLESALE (18)</option>
+         <option value="AUTOMOBILE TIRES, RECAPPING">AUTOMOBILE TIRES, RECAPPING (34)</option>
+         <option value="AUTOMOBILE, RENTAL/LEASING">AUTOMOBILE, RENTAL/LEASING (23)</option>
+         <option value="BAKERY STORES, W/R SALES ONLY">BAKERY STORES, W/R SALES ONLY (20)</option>
+         <option value="BAKERY, WHOLESALE/RETAIL">BAKERY, WHOLESALE/RETAIL (67)</option>
+         <option value="BAR">BAR (113)</option>
+         <option value="BARREL/DRUM/PALLET MFG/DEALER">BARREL/DRUM/PALLET MFG/DEALER (1)</option>
+         <option value="BATTERIES, MANUFACTURER">BATTERIES, MANUFACTURER (2)</option>
+         <option value="BEAUTY SHOPS/SCHOOLS">BEAUTY SHOPS/SCHOOLS (1)</option>
+         <option value="BONDSMEN">BONDSMEN (3)</option>
+         <option value="BOOK_STORE">BOOK_STORE (54)</option>
+         <option value="BUILDING MATERIALS, WHOLESALE">BUILDING MATERIALS, WHOLESALE (6)</option>
+         <option value="BUILDING MATERIALS-SUPPLIES">BUILDING MATERIALS-SUPPLIES (17)</option>
+         <option value="BUSINESS SERVICES, NOT CLASS">BUSINESS SERVICES, NOT CLASS (2)</option>
+         <option value="CABINET SHOPS,MANUFACTURING">CABINET SHOPS,MANUFACTURING (5)</option>
+         <option value="CAR_DEALER">CAR_DEALER (119)</option>
+         <option value="CAR_RENTAL">CAR_RENTAL (3)</option>
+         <option value="CHECK CASHERS">CHECK CASHERS (1)</option>
+         <option value="CHEMICAL & ALLIED PRODUCTS">CHEMICAL & ALLIED PRODUCTS (7)</option>
+         <option value="CHURCH">CHURCH (524)</option>
+         <option value="CIGAR STORE & STANDS, RETAIL">CIGAR STORE & STANDS, RETAIL (2)</option>
+         <option value="COAL, WHOLESALE">COAL, WHOLESALE (1)</option>
+         <option value="COFFEE OR TEA STORES, RETAIL">COFFEE OR TEA STORES, RETAIL (1)</option>
+         <option value="COLD STORAGE WAREHOUSE">COLD STORAGE WAREHOUSE (14)</option>
+         <option value="CONCRETE,MANUFACTURER (MIXED)">CONCRETE,MANUFACTURER (MIXED) (4)</option>
+         <option value="CONSULTANT/MGMT,COUNSELOR,BUS">CONSULTANT/MGMT,COUNSELOR,BUS (2)</option>
+         <option value="CONTRACTOR,OTHER THAN BUILDING">CONTRACTOR,OTHER THAN BUILDING (1)</option>
+         <option value="CONTRACTOR-BLDG CONSTRUCTION">CONTRACTOR-BLDG CONSTRUCTION (4)</option>
+         <option value="CONTRACTOR-RESIDENTIAL">CONTRACTOR-RESIDENTIAL (3)</option>
+         <option value="CONVALESCENT/PERSONAL CARE HME">CONVALESCENT/PERSONAL CARE HME (9)</option>
+         <option value="DENTIST">DENTIST (163)</option>
+         <option value="DEPARTMENT STORES">DEPARTMENT STORES (23)</option>
+         <option value="DRUG STORE, RETAIL">DRUG STORE, RETAIL (2)</option>
+         <option value="DRY CLEANING & ALTERATIONS">DRY CLEANING & ALTERATIONS (64)</option>
+         <option value="DRY CLEANING, RETAIL">DRY CLEANING, RETAIL (31)</option>
+         <option value="DRYING CLEANING, COIN OPERATED">DRYING CLEANING, COIN OPERATED (20)</option>
+         <option value="DayCare">DayCare (50)</option>
+         <option value="EDUCATIONAL SERVICES & SCHOOLS">EDUCATIONAL SERVICES & SCHOOLS (365)</option>
+         <option value="FAST FOOD RESTAURANT">FAST FOOD RESTAURANT (183)</option>
+         <option value="FLORIST, RETAIL">FLORIST, RETAIL (143)</option>
+         <option value="FRUIT & PRODUCE,RETAIL">FRUIT & PRODUCE,RETAIL (1)</option>
+         <option value="FUEL & ICE DEALERS, RETAIL">FUEL & ICE DEALERS, RETAIL (1)</option>
+         <option value="FURNITURE REPAIR & REUPHOLSTER">FURNITURE REPAIR & REUPHOLSTER (22)</option>
+         <option value="FURNITURE/FIXTURES-MANUFACT">FURNITURE/FIXTURES-MANUFACT (23)</option>
+         <option value="GAS,LIQUID PETROLEUM/SUPPLY">GAS,LIQUID PETROLEUM/SUPPLY (2)</option>
+         <option value="GASOLINE SERVICE STATION">GASOLINE SERVICE STATION (97)</option>
+         <option value="GASOLINE, WHOLESALE">GASOLINE, WHOLESALE (3)</option>
+         <option value="GLASS MFG/LAMINATING">GLASS MFG/LAMINATING (1)</option>
+         <option value="GLASS REPLACE & REPAIR AUTO">GLASS REPLACE & REPAIR AUTO (7)</option>
+         <option value="GLASS/PAINT/WALL PAPER, RETAIL">GLASS/PAINT/WALL PAPER, RETAIL (15)</option>
+         <option value="GOLF COURSES-INCL MINIATURE">GOLF COURSES-INCL MINIATURE (3)</option>
+         <option value="GRAPHIC DESIGNS">GRAPHIC DESIGNS (1)</option>
+         <option value="GROCERIES & RELATED PRODUCTS">GROCERIES & RELATED PRODUCTS (1)</option>
+         <option value="GROCERS, RETAIL">GROCERS, RETAIL (363)</option>
+         <option value="HARDWARE, RETAIL">HARDWARE, RETAIL (29)</option>
+         <option value="HEALTH SERVICES/OFFICES NEC">HEALTH SERVICES/OFFICES NEC (1)</option>
+         <option value="HOME FURNISHING STORES,RETAIL">HOME FURNISHING STORES,RETAIL (221)</option>
+         <option value="HOSPITAL">HOSPITAL (135)</option>
+         <option value="HOSPITAL SANITARIURMS & LIKE">HOSPITAL SANITARIURMS & LIKE (1)</option>
+         <option value="HOTEL/MOTEL">HOTEL/MOTEL (151)</option>
+         <option value="INDUSTRIAL SUPPLIES,WHOLESALE">INDUSTRIAL SUPPLIES,WHOLESALE (5)</option>
+         <option value="JEWELRY, RETAIL">JEWELRY, RETAIL (1)</option>
+         <option value="JEWELRY, WHOLESALE">JEWELRY, WHOLESALE (1)</option>
+         <option value="KARATE, GYMS, JUDO">KARATE, GYMS, JUDO (10)</option>
+         <option value="LAUNDRIES,HAND/AUTOMATIC MACH">LAUNDRIES,HAND/AUTOMATIC MACH (107)</option>
+         <option value="LIBRARY">LIBRARY (45)</option>
+         <option value="LIQUOR LICENSE">LIQUOR LICENSE (385)</option>
+         <option value="MACHINE SHOPS,JOBBING/REPAIR">MACHINE SHOPS,JOBBING/REPAIR (2)</option>
+         <option value="MACHINERY & EQUIPMENT MFG">MACHINERY & EQUIPMENT MFG (1)</option>
+         <option value="MANUFACTURING NOT CLASSIFIED">MANUFACTURING NOT CLASSIFIED (2)</option>
+         <option value="MASSAGE/TATOO PARLOR/ARTIST">MASSAGE/TATOO PARLOR/ARTIST (6)</option>
+         <option value="MATTRESS MAKERS">MATTRESS MAKERS (1)</option>
+         <option value="METAL JOBBERS, WHOLESALE">METAL JOBBERS, WHOLESALE (3)</option>
+         <option value="METAL PRODUCTS, MANUFACTURING">METAL PRODUCTS, MANUFACTURING (7)</option>
+         <option value="METAL PRODUCTS, NOT CLASSIFIED">METAL PRODUCTS, NOT CLASSIFIED (3)</option>
+         <option value="MISC BUSINESS SERVICE">MISC BUSINESS SERVICE (11)</option>
+         <option value="MISCELLANEOUS RETAIL STORES">MISCELLANEOUS RETAIL STORES (1)</option>
+         <option value="MOSQUE">MOSQUE (6)</option>
+         <option value="MOTION PIC THEATRE(NOT DRV-IN)">MOTION PIC THEATRE(NOT DRV-IN) (11)</option>
+         <option value="MOVERS,LOCAL TRUKING & STORAGE">MOVERS,LOCAL TRUKING & STORAGE (15)</option>
+         <option value="NIGHT CLUB">NIGHT CLUB (70)</option>
+         <option value="NURSING HOME">NURSING HOME (7)</option>
+         <option value="PAINT MANUFACTURER">PAINT MANUFACTURER (4)</option>
+         <option value="PAINT/WALL PAPER, WHOLESALE">PAINT/WALL PAPER, WHOLESALE (4)</option>
+         <option value="PAINTER">PAINTER (68)</option>
+         <option value="PAPER JOBBERS,DEALERS,AGENTS">PAPER JOBBERS,DEALERS,AGENTS (2)</option>
+         <option value="PAPER MILLS & ALLIED PRODUCTS">PAPER MILLS & ALLIED PRODUCTS (3)</option>
+         <option value="PERSONAL SERVICES-MISC">PERSONAL SERVICES-MISC (2)</option>
+         <option value="PHYSICAL FITNESS FACILITY/SPAS">PHYSICAL FITNESS FACILITY/SPAS (1)</option>
+         <option value="PLACE_OF_WORSHIP">PLACE_OF_WORSHIP (20)</option>
+         <option value="PLUMB/HEAT SUPPLIES, WHOLSALE">PLUMB/HEAT SUPPLIES, WHOLSALE (12)</option>
+         <option value="PLUMBER">PLUMBER (137)</option>
+         <option value="PRECIOUS METALS">PRECIOUS METALS (1)</option>
+         <option value="PreK">PreK (205)</option>
+         <option value="REAL ESTATE AGENTS">REAL ESTATE AGENTS (1)</option>
+         <option value="RECYCLING-METAL(WASTE & SCRAP)">RECYCLING-METAL(WASTE & SCRAP) (12)</option>
+         <option value="RESTAURANTS">RESTAURANTS (1235)</option>
+         <option value="RETAIL TRADE-APPAREL/ACCESSORY">RETAIL TRADE-APPAREL/ACCESSORY (1)</option>
+         <option value="ROOFING, WHOLESALE">ROOFING, WHOLESALE (6)</option>
+         <option value="ROOFING_CONTRACTOR">ROOFING_CONTRACTOR (65)</option>
+         <option value="RUBBER & MISCELLANEOUS PRODUCT">RUBBER & MISCELLANEOUS PRODUCT (1)</option>
+         <option value="RUG CLEANING COMPANY">RUG CLEANING COMPANY (7)</option>
+         <option value="SHOPPING_MALL">SHOPPING_MALL (72)</option>
+         <option value="SOAP, MANUFACTURING">SOAP, MANUFACTURING (1)</option>
+         <option value="STORAGE/WAREHOUSING">STORAGE/WAREHOUSING (49)</option>
+         <option value="SYNAGOGUE">SYNAGOGUE (6)</option>
+         <option value="TEMPORARY EMPLOYMENT AGENCIES">TEMPORARY EMPLOYMENT AGENCIES (1)</option>
+         <option value="TEXTILE MILL PRODUCTS,MFG">TEXTILE MILL PRODUCTS,MFG (2)</option>
+         <option value="TRANSPORTATION EQUIPMENT">TRANSPORTATION EQUIPMENT (2)</option>
+         <option value="TRUCKING/COURIER-EXCEPT RENTAL">TRUCKING/COURIER-EXCEPT RENTAL (35)</option>
+         <option value="VARIETY STORES">VARIETY STORES (23)</option>
+         <option value="VETERINARY_CARE">VETERINARY_CARE (33)</option>
+         <option value="WELDING SHOP">WELDING SHOP (6)</option>
+         <option value="WHOLESALE NOT CLASSIFIED">WHOLESALE NOT CLASSIFIED (3)</option>
+         <option value="WHOLESALE-BEER, WINE & DISTILLED ALCOHOLIC BEVERAGES">WHOLESALE-BEER, WINE & DISTILLED ALCOHOLIC BEVERAGES (3)</option>
+         <option value="WRECKING BUILDINGS">WRECKING BUILDINGS (1)</option>
+            </select>
+        </div>
+    </div>
+
+        <hr>
+
+    <div id="risk_filter_div">
+     <input class="riskFilter" id="lowRisk"  name="riskFilter" value="low risk" type="checkbox"><p class="risk_text">Low Risk</p></input>
+     <input class="riskFilter" id="medRisk"  name="riskFilter" value="medium risk" type="checkbox"><p class="risk_text">Medium Risk</p></input>
+     <input class="riskFilter" id="highRisk"  name="riskFilter" value="high risk" type="checkbox"><p class="risk_text">High Risk</p></input>
+        <!--
+
+        Remove the comments here if you want to add another Risk Filter for "NA" values. That is, all of the properties we were not able to generate a risk score for.
+
+        <input class="riskFilter" id="naRisk"  name="riskFilter" value="NA" type="checkbox"><p class="risk_text">N/A</p></input> 
+
+        -->
+    </div>
+
+    <hr>
+        <form>
+            <div id="radio">
+                <input type="radio" class="radio" id="radio1" name="radio" checked="checked"><label for="radio1">No Overlay</label>
+                <input type="radio" class="radio" id="radio2" name="radio" ><label for="radio2">Battalions</label> <br>
+                <input type="radio" class="radio" id="radio3" name="radio"><label for="radio3">NPU</label>
+                <input type="radio" class="radio" id="radio4" name="radio"><label for="radio4">Council Districts</label>
+            </div>
+        </form>
+
+    <hr>
+
+    <button type="button" id="reset">Reset Filters</button>
+
+</div>  <!-- End filter options UI menu -->
+
+
+
+ <!-- Tooltip popup - The default text changes here on hover.  -->
+<div id="info_text">
+    <div class="vertical_line" id="no_line">
+        <p id="d3_tip">Hover over a point to see information.</p> 
+        <div id="d3_text"></div>
+    </div>
+</div>
+
+    
+
+
+<script src="js/chosen.jquery.js" type="text/javascript"></script>
+<script src="js/prism.js" type="text/javascript" charset="utf-8"></script>
+<script type= "text/javascript" src="js/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script src="js/jquery-ui-1.8.16.custom.min.js"></script>
+<script src="js/jQDateRangeSlider-min.js"></script>
+
+
+
+
+
+
+<script>
+// Javascript code begins here.
+
+
+
+
+// This is a Mapbox function that loads the basemap, blanks the ZoomControl (so we can add it to a different position), and sets the Max and Min Zoom levels and the default center of the map. 
+var map = L.mapbox.map('map', null, { zoomControl:false, maxZoom: 19, minZoom: 12 }) 
+    .setView([33.770, -84.448], 12);  // Change this if you want to use this for a different city. 
+
+
+
+
+    map.on('zoomend', function(){   // Function that updates the size of the circles depending on the level of zoom (smaller when further away, larger up close).
+        var currentZoom = map.getZoom();
+        var radius = currentZoom-7
+        
+       // console.log(currentZoom);
+        g.selectAll("circle")
+            .attr("r", radius);
+    });
+
+
+// This is where I provide my unique map id (mmadaio.mi9pd4k3) and my access token - replace them both with your own ones in the string here. 
+L.tileLayer('https://{s}.tiles.mapbox.com/v4/mmadaio.mi9pd4k3/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibW1hZGFpbyIsImEiOiI0ZGYyMDZhMTljODc1NDMxMzFmNWViNmZmN2RkMzM1MCJ9.VGM8Up392NHuCAdHViv-lg').addTo(map);
+
+new L.Control.Zoom({ position: 'topright' }).addTo(map); // This adds a new ZoomControl button to the top right corner of the map, instead of the default top left.
+
+
+
+
+
+
+var svg = d3.select(map.getPanes().overlayPane)  // All of the SVG images will be drawn as an overlay on top of the map.
+        .append("svg");
+
+var g = svg.append("g").attr("class", "leaflet-zoom-hide");  // Hide the dots on zoom. Ideally they would remain in position and scale in size, like Google Maps. 
+
+
+
+
+
+
+
+
+
+function showText(d) {  // This updates the display labels for each point. Change it if you want different info to show on hover.
+    return  propertyType(d) + '</b><br />' + '</b><br />' + "<strong></strong> <span style='color:black'>" + propertyName(d) + '</b><br />' + propertyAddress(d)  + "Property Type: " + type(d) + date(d) + risk(d) + riskNum(d) + area(d);
+                   }
+
+
+
+
+
+
+// The following functions update the various properties for the point labels
+
+
+function propertyName(d) {  // Updates property name (or address, for fire incident)
+    if (d.properties.in_fsaf_yn != "fire") {
+        return "Name: " + d.properties.name;
+    } else {
+        return "Address: " + d.properties.location;  // Fires have no business name, just an address.
+    }
+}
+
+function propertyAddress(d) {
+    if (d.properties.in_fsaf_yn != "fire") {  // If it's not a fire
+        if (d.properties.address != "NA") {    // And it has an address
+            return "Address: " + d.properties.address + '</span>' + '</b><br />';  // Display the address
+        } else {
+            return "";
+        }
+    } else {
+        return "";
+    }
+}
+   
+
+function propertyType(d) {  // Display the one of three main types
+    if (d.properties.in_fsaf_yn == "1") {
+        return "Currently Inspected";
+    } else if (d.properties.in_fsaf_yn == "fire") {  
+        return "Fire Incident";
+    } else if (d.properties.in_fsaf_yn == "0") {
+        return "Potential Inspection";
+    }
+}
+
+function type(d) {  // Display the unique property usage type, depending on if it's a fire, current, or potential inspection
+    if (d.properties.in_fsaf_yn == "fire") {
+        if (d.properties.Property_u != "NA") {
+            return d.properties.Property_u;
+        }
+    } else {
+        if (d.properties.occup_type != "NA") {
+            return d.properties.occup_type;
+        } else if (d.properties.new_prop_type != "NA") {
+            return d.properties.new_prop_type;
+        }
+    }
+}
+
+function date(d) {  // Displays the date of the fire or inspection.
+    if (d.properties.in_fsaf_yn == "fire") {
+        return '</b><br />' + "Fire occurred on: " + d.properties.Incident_d;
+    } else if (d.properties.in_fsaf_yn == "1") {
+        return '</b><br />' + "Previously inspected on: " + d.properties.inspection_date;
+    } else {
+        return "";
+    }
+}
+
+
+function risk(d) {  // Displays the risk score category, if available
+    if (d.properties.risk_category != null) {
+        if (d.properties.risk_category != "NA") {
+            if (d.properties.risk_category == "low risk") {
+                return '</b><br />' + "Risk Score: Low";
+            } else if (d.properties.risk_category == "medium risk") {
+                return '</b><br />' + "Risk Score: Medium";
+            } else if (d.properties.risk_category == "high risk") {
+                return '</b><br />' + "Risk Score: High";
+            } 
+        } else {
+            return ""; // Inspected and Potential with NO risk scores
+        }
+    } else {
+        return ""; // These are the fires. You might want to put an indicator of "Fire" here, or not.
+    }
+}
+
+function riskNum(d) {  // Displays the risk score number, if available
+    if (d.properties.risk_rating != null) {
+        if (d.properties.risk_rating != "0") {
+            return " (" + d.properties.risk_rating + ")";
+        } else {
+            return ""; // Inspected and Potential with NO risk scores
+        }
+    } else {
+        return ""; // These are the fires. You might want to put an indicator of "Fire" here, or not.
+    }
+}
+
+
+function area(d) { // Displays the particular region it is in, when that region overlay is active.
+    if (battalion) {
+        return '</b><br />' + "Battalion: " + d.properties.BATTALION;
+    } else if (NPU) {
+        return '</b><br />' + "NPU: " + d.properties.NPU;
+    } else if (council) {
+        return '</b><br />' + "Council: " + d.properties.DISTRICT;
+    } else {
+        return "";
+    }
+}
+
+
+
+
+
+
+
+// Updates the labels for each of the overlays
+
+function layerText(d) {  // Updates with the unique letter or number for that overlay region.
+    return layerTitle() + layerName(d);
+}
+
+
+function layerTitle() {
+    if (battalion) {
+        return "Battalion ";
+    } else if (NPU) {
+        return "NPU ";
+    } else if (council) {
+        return "Council District ";
+    }
+}
+
+function layerName(d) { 
+    if (battalion) {
+        return d.properties.Battalion;
+    } else if (NPU) {
+        return d.properties.NPU;
+    } else if (council) {
+        return d.properties.DISTRICT;
+    }
+}
+
+function layerDetails(d) {  // Updates the details about counts and percentages of fires, current, and potential inspections.
+    if (battalion) {
+        return "Fires: " + battalion_fire_total(d) + " (" + fire_perc(d) + ")" + '</b><br />' + "Inspections: " + battalion_insp_total(d) + " (" + insp_perc(d) + ")" + '</b><br />' + "Potentials: " + battalion_potential_total(d) + " (" + potential_perc(d) + ")";
+    } else  if (NPU) {
+        return "Fires: " + NPU_fire_total(d) + " (" + fire_perc(d) + ")" + '</b><br />' + "Inspections: " + NPU_insp_total(d) + " (" + insp_perc(d) + ")" + '</b><br />' + "Potentials: " + NPU_potential_total(d)+ " (" + potential_perc(d) + ")";
+    } else if (council) {
+        return "Fires: " + council_fire_total(d) + " (" + fire_perc(d) + ")" + '</b><br />' + "Inspections: " + council_insp_total(d) + " (" + insp_perc(d) + ")" + '</b><br />' + "Potentials: " + council_potential_total(d)+ " (" + potential_perc(d) + ")";
+    } else {
+        return "";
+    } 
+}
+
+
+
+
+// These functions get the totals for fires, inspections, and potentials for the battalion being hovered over.
+function battalion_fire_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.BATTALION == currentArea) {    // currentArea is the current hovered area
+                return "circle current_battalion";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_battalion[fill="#AA3939"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+
+function battalion_insp_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.BATTALION == currentArea) {
+                return "circle current_battalion";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_battalion[fill="#4CAF50"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+function battalion_potential_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.BATTALION == currentArea) {
+                return "circle current_battalion";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_battalion[fill="#1F77B4"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+
+
+// Get totals for NPU's
+function NPU_fire_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.NPU == currentArea) {
+                return "circle current_NPU";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_NPU[fill="#AA3939"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+
+function NPU_insp_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.NPU == currentArea) {
+                return "circle current_NPU";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_NPU[fill="#4CAF50"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+
+function NPU_potential_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.NPU == currentArea) {
+                return "circle current_NPU";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_NPU[fill="#1F77B4"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+
+// Get totals for Council districts
+
+function council_fire_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.DISTRICT == currentArea) {
+                return "circle current_council";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_council[fill="#AA3939"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+function council_insp_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.DISTRICT == currentArea) {
+                return "circle current_council";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_council[fill="#4CAF50"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+function council_potential_total(d) {
+        g.selectAll("circle")
+        .attr("class", function (d) { 
+            if (d.properties.DISTRICT == currentArea) {
+                return "circle current_council";
+            } else {
+                return "circle";
+            }
+        })
+        return $('.current_council[fill="#1F77B4"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length;  
+}
+
+
+
+// These functions compute the percentages of properties in each overlay
+
+function fire_perc(d) {
+    if (battalion) {
+        if (battalion_fire_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(battalion_fire_total(d) / $('.circle[fill="#AA3939"]').filter(function() {  // Update total circles displayed in console log on hover
+                return $(this).css('display') !== 'none';
+            }).length * 100) + "%"; 
+        }
+    } else if (NPU) {
+        if (NPU_fire_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(NPU_fire_total(d) / $('.circle[fill="#AA3939"]').filter(function() {  // Update total circles displayed in console log on hover
+                return $(this).css('display') !== 'none';
+            }).length * 100) + "%"; 
+        }
+    } else if (council) {
+        if (council_fire_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(council_fire_total(d) / $('.circle[fill="#AA3939"]').filter(function() {  // Update total circles displayed in console log on hover
+                 return $(this).css('display') !== 'none';
+            }).length * 100) + "%"; 
+        }
+    }
+}
+
+
+function insp_perc(d) {
+    if (battalion) {
+        if (battalion_insp_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(battalion_insp_total(d) / $('.circle[fill="#4CAF50"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length * 100) + "%"; 
+        }
+    } else if (NPU) {
+         if (NPU_insp_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(NPU_insp_total(d) / $('.circle[fill="#4CAF50"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length * 100) + "%"; 
+        }
+    } else if (council) {
+         if (council_insp_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(council_insp_total(d) / $('.circle[fill="#4CAF50"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length * 100) + "%"; 
+        }
+    } else {
+        return "";
+    }
+}
+
+
+
+
+function potential_perc(d) {
+    if (battalion) {
+        if (battalion_potential_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(battalion_potential_total(d) / $('.circle[fill="#1F77B4"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length * 100) + "%"; 
+        }
+    } else if (NPU) {
+        if (NPU_potential_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(NPU_potential_total(d) / $('.circle[fill="#1F77B4"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length * 100) + "%"; 
+        }
+    } else if (council) {
+        if (council_potential_total(d) == 0) {
+            return "0%"
+        } else {
+            return Math.round(council_potential_total(d) / $('.circle[fill="#1F77B4"]').filter(function() {  // Update total circles displayed in console log on hover
+                    return $(this).css('display') !== 'none';
+                }).length * 100) + "%"; 
+        }
+    } else {
+        return "";
+    }
+}
+
+
+
+
+
+
+ // These update the total counts of the selected points in the main filter UI
+function updateFireCount() {
+    return "Fire Incidents: " + fires;  
+}
+
+function updateInspectionCount() {
+    return "Current Inspections: " + insp;  
+}
+
+function updatePotentialCount() {
+    return "Potential Inspections: " + potential;  
+}
+
+
+
+
+
+
+
+
+// These functions move the active selection to the back or to the front. This is used mainly for the overlays, but might be useful for the individual points.
+
+
+d3.selection.prototype.moveToBack = function() { 
+    return this.each(function() { 
+        var firstChild = this.parentNode.firstChild; 
+        if (firstChild) { 
+            this.parentNode.insertBefore(this, firstChild); 
+        } 
+    }); 
+}
+
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+  this.parentNode.appendChild(this);
+  });
+}; 
+
+
+
+
+
+
+
+
+
+// This is where the points on the map get drawn.
+
+
+function drawDots(data) {
+
+            // d3 geo projections from lat/long to SVG
+
+            var transform = d3.geo.transform({
+                point: projectPoint
+            }); 
+
+
+            var d3path = d3.geo.path()
+                .projection(transform);
+
+        
+
+        // Creation of each point
+            var pointLayer = g.selectAll("circle")
+                .data(data.features)
+                .enter()
+                .append("circle")
+                //.append("rect") - To try it with rectangles, that may that load faster
+                .attr("r", 5.5) 
+                // .attr("x", 10) - Use these instead of "r" if you're drawing rects instead of circles. Be sure to change the css ".circle" to .rect, as well as changing the "r" in the zoomEnd function to scale the sizes as you zoom
+                //  .attr("y", 10)
+                //  .attr("width", 10)
+                // .attr("height", 10);
+                .style("opacity", .7) // Modify the opacity of the dots, if you want
+                .style("weight", 1)  // This is the stroke weight of the border
+                .style("fillOpacity", .3) // This is opacity of the fill
+                .attr("class", 'circle')           
+                .attr("fill", function(d) {  // Set the color for each different type. Change the hex codes here if you want different color palettes.
+                    if (d.properties.in_fsaf_yn == "1") {
+                        return '#4CAF50'; 
+                    } else if (d.properties.in_fsaf_yn == "0") {
+                        return "#1F77B4"; 
+                    } else if (d.properties.in_fsaf_yn == "fire") {
+                        return "#AA3939"
+                    } 
+                })
+                .on("click", mouseClick) // This does nothing, except log to the console that a click occurred. Use this if you want something to happen when you click on the points.
+                .on('mouseover', function(d) {
+
+                    d3.select(this).style("stroke", "black");  // Add a black stroke outline to the points on hover
+                    d3.select(this).style("stroke-width", "3");  
+                
+             //   console.log("Total circles: " + $('.circle').filter(function() {  // Update total circles displayed in console log on hover
+               //     return $(this).css('display') !== 'none';
+                //}).length); 
+                   // d3.select(this).moveToFront();  // Add back in if you want the hovered circles to move to the front
+
+                    if (d.properties.in_fsaf_yn == "1") {  // Change the border color of the text detail label to correspond to the point's color
+                        $("#info_text").css({"border-left":"thick solid #4CAF50"}); 
+                        $("#info_text").css({"border-bottom":"thick solid #4CAF50"}); 
+                    } else if (d.properties.in_fsaf_yn == "0") {
+                        $("#info_text").css({"border-left":"thick solid #1F77B4"}); 
+                        $("#info_text").css({"border-bottom":"thick solid #1F77B4"}); 
+                    } else {
+                        $("#info_text").css({"border-left":"thick solid #AA3939"}); 
+                        $("#info_text").css({"border-bottom":"thick solid #AA3939"}); 
+                    }
+
+                    var fieldNameElement = document.getElementById('d3_tip');
+                    fieldNameElement.innerHTML = showText(d);  // Update the text
+                   
+                   
+
+                })
+                .on('mouseout',  function() {
+                 d3.select(this).style("stroke", "");  // Undo those things when you mouseOut
+
+                  $("#info_text").css({"border-left":""}); 
+                  $("#info_text").css({"border-bottom":""}); 
+
+
+                    var fieldNameElement = document.getElementById('d3_tip');
+                    fieldNameElement.innerHTML = "Hover over a point to see information."  
+                });
+                
+
+            map.on("viewreset", reset);
+
+            
+            // Applies the coordinates to the map
+
+            reset();
+
+
+            function reset() {
+                var bounds = d3path.bounds(data),
+                    topLeft = bounds[0],
+                    bottomRight = bounds[1];
+                 pointLayer.attr("transform",
+                    function(d) {
+                        return "translate(" +
+                            applyLatLngToLayer(d).x + "," +
+                            applyLatLngToLayer(d).y + ")";
+                    });
+                svg.attr("width", bottomRight[0] - topLeft[0] + 120)
+                    .attr("height", bottomRight[1] - topLeft[1] + 120)
+                    .style("left", topLeft[0] - 50 + "px")
+                    .style("top", topLeft[1] - 50 + "px");
+               
+                g.attr("transform", "translate(" + (-topLeft[0] + 50) + "," + (-topLeft[1] + 50) + ")");
+            } // end reset   
+
+
+            function projectPoint(x, y) {
+                var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+                this.stream.point(point.x, point.y);
+            } 
+
+
+            // Gets total counts for each point. This would be cleaner as a function that got called whenever you wanted to get the totals.
+  total =  $('.circle').filter(function() {
+                    return $(this).css('display') !== 'none';
+                }).length; 
+
+     fires = $('.circle[fill="#AA3939"]').filter(function() {
+                    return $(this).css('display') !== 'none';
+                }).length;
+
+         insp = $('.circle[fill="#4CAF50"]').filter(function() {
+                    return $(this).css('display') !== 'none';
+                }).length;
+
+         potential = $('.circle[fill="#1F77B4"]').filter(function() {
+                    return $(this).css('display') !== 'none';
+                }).length;
+         updateCount();
+}
+    
+
+
+// Initialize variables for overlays
+var none;
+var battalion;
+var NPU;
+var council;
+var newText;
+var currentArea;
+var geojson;
+
+
+
+
+// Draw the overlays
+function drawOverlay() {
+   if (battalion == true) {
+        d3.json("Battalions.json", function(battalion) {
+          var transform = d3.geo.transform({point: projectPoint}),
+              path = d3.geo.path().projection(transform);
+
+
+          var feature = g.selectAll("path")
+            .data(battalion.features)
+            .enter().append("path")
+            .on("click", mouseClick)
+            .on("mouseover", function(d) { 
+                $("path").css("fill", "transparent");
+                d3.select(this).style("fill", "gray");
+                $("#d3_tip").css("font-size", "22");
+                $("#info_text").css({"border-left":"thick solid #303030"}); 
+                 $("#info_text").css({"border-bottom":"thick solid #303030"}); 
+                 $("#d3_text").css({"font-size": "18"});
+                $("#d3_text").css({"font-color": "gray"});
+                currentArea = d.properties.Battalion;
+                var fieldNameElement = document.getElementById('d3_tip');
+                fieldNameElement.innerHTML = layerText(d);
+                var details = document.getElementById('d3_text');
+                details.innerHTML = layerDetails(d);
+               
+                var sel = d3.select(this);  
+                sel.moveToBack();  
+            })
+            .on('mouseout',  function(d){
+                $("path").css("fill", "transparent");
+                d3.select(this).style("fill", "gray");
+                // Maybe include these next two lines, to allow the overlay outlines to stay on top of the dots, instead of moving them behind. But, there's a flicker problem I wasn't able to solve - since each of the dots count as "outside" the overlay.
+                // var sel = d3.select(this);
+              //  sel.moveToFront();   
+                $("#d3_tip").css("font-size", "16");
+                $("#info_text").css({"border-left":""}); 
+                 $("#info_text").css({"border-bottom":""}); 
+                var fieldNameElement = document.getElementById('d3_tip');
+                fieldNameElement.innerHTML = "Hover over a point to see information."
+                var details = document.getElementById('d3_text');
+                details.innerHTML = null;
+            });
+
+
+          map.on("viewreset", reset);
+          reset();
+
+        function reset() {
+            var bounds = path.bounds(battalion),
+                topLeft = bounds[0],
+                bottomRight = bounds[1];
+
+            svg .attr("width", bottomRight[0] - topLeft[0])
+                .attr("height", bottomRight[1] - topLeft[1])
+                .style("left", topLeft[0] + "px")
+                .style("top", topLeft[1] + "px");
+               
+
+            g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+
+            feature.attr("d", path);
+          }
+
+          function projectPoint(x, y) {
+            var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+            this.stream.point(point.x, point.y);
+          }
+          
+    }); 
+
+    } else if (NPU) {
+
+        d3.json("NPU.json", function(npuPolygons) {
+          var transform = d3.geo.transform({point: projectPoint}),
+              path = d3.geo.path().projection(transform);
+
+
+
+
+          var feature = g.selectAll("path")
+              .data(npuPolygons.features)
+            .enter().append("path")
+            .on("click", mouseClick)
+            .on("mouseover", function(d) { 
+                $("path").css("fill", "transparent");
+                d3.select(this).style("fill", "gray");
+                $("#d3_tip").css("font-size", "22");
+                $("#info_text").css({"border-left":"thick solid #303030"}); 
+                 $("#info_text").css({"border-bottom":"thick solid #303030"}); 
+                 $("#d3_text").css({"font-size": "18"});
+                $("#d3_text").css({"font-color": "gray"});
+                currentArea = d.properties.NPU;
+                var fieldNameElement = document.getElementById('d3_tip');
+                fieldNameElement.innerHTML = layerText(d);
+                var details = document.getElementById('d3_text');
+                details.innerHTML = layerDetails(d);
+               
+                var sel = d3.select(this);  
+                sel.moveToBack();  
+            })
+            .on('mouseout',  function(d){
+                $("path").css("fill", "transparent");
+                d3.select(this).style("fill", "gray");
+                $("#d3_tip").css("font-size", "16");
+                $("#info_text").css({"border-left":""}); 
+                 $("#info_text").css({"border-bottom":""}); 
+                var fieldNameElement = document.getElementById('d3_tip');
+                fieldNameElement.innerHTML = "Hover over a point to see information."
+                var details = document.getElementById('d3_text');
+                details.innerHTML = null;
+            });
+
+          map.on("viewreset", reset);
+          reset();
+
+        function reset() {
+            var bounds = path.bounds(npuPolygons),
+                topLeft = bounds[0],
+                bottomRight = bounds[1];
+
+            svg .attr("width", bottomRight[0] - topLeft[0])
+                .attr("height", bottomRight[1] - topLeft[1])
+                .style("left", topLeft[0] + "px")
+                .style("top", topLeft[1] + "px");
+               
+
+            g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+
+            feature.attr("d", path);
+          }
+
+          function projectPoint(x, y) {
+            var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+            this.stream.point(point.x, point.y);
+          }
+          
+        }); 
+
+    } else if (council) {
+        d3.json("council_districts.json", function(councils) {
+          var transform = d3.geo.transform({point: projectPoint}),
+              path = d3.geo.path().projection(transform);
+
+          var feature = g.selectAll("path")
+              .data(councils.features)
+           .enter().append("path")
+            .on("click", mouseClick)
+            .on("mouseover", function(d) { 
+                $("path").css("fill", "transparent");
+                d3.select(this).style("fill", "gray");
+                $("#d3_tip").css("font-size", "22");
+                $("#info_text").css({"border-left":"thick solid #303030"}); 
+                 $("#info_text").css({"border-bottom":"thick solid #303030"}); 
+                 $("#d3_text").css({"font-size": "18"});
+                $("#d3_text").css({"font-color": "gray"});
+                currentArea = d.properties.DISTRICT;
+                var fieldNameElement = document.getElementById('d3_tip');
+                fieldNameElement.innerHTML = layerText(d);
+                var details = document.getElementById('d3_text');
+                details.innerHTML = layerDetails(d);
+               
+                var sel = d3.select(this);  
+                sel.moveToBack();  
+            })
+            .on('mouseout',  function(d){
+                $("path").css("fill", "transparent");
+                d3.select(this).style("fill", "gray");
+                $("#d3_tip").css("font-size", "16");
+                $("#info_text").css({"border-left":""}); 
+                 $("#info_text").css({"border-bottom":""}); 
+                var fieldNameElement = document.getElementById('d3_tip');
+                fieldNameElement.innerHTML = "Hover over a point to see information."
+                var details = document.getElementById('d3_text');
+                details.innerHTML = null;
+
+            });
+
+          map.on("viewreset", reset);
+          reset();
+
+        function reset() {
+            var bounds = path.bounds(councils),
+                topLeft = bounds[0],
+                bottomRight = bounds[1];
+
+            svg .attr("width", bottomRight[0] - topLeft[0])
+                .attr("height", bottomRight[1] - topLeft[1])
+                .style("left", topLeft[0] + "px")
+                .style("top", topLeft[1] + "px");
+               
+            g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+
+            feature.attr("d", path);
+          }
+
+          function projectPoint(x, y) {
+            var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+            this.stream.point(point.x, point.y);
+          }
+          
+        }); 
+
+    } else if (none) {
+        g.selectAll("path")
+            .remove();
+        return;
+
+    }
+    
+} 
+
+
+
+function mouseClick() {  // In case you want to do anything when you click on a point or overlay.
+        //console.log("mouseClick");
+}            
+
+
+
+function updateCount() {  // Updates the label count in the UI text box
+    var fieldNameElement = document.getElementById('fire_label');
+    fieldNameElement.innerHTML = updateFireCount();
+
+    var fieldNameElement1 = document.getElementById('inspection_label');
+    fieldNameElement1.innerHTML = updateInspectionCount();
+
+    var fieldNameElement2 = document.getElementById('potential_label');
+    fieldNameElement2.innerHTML = updatePotentialCount();
+}
+
+
+
+function resetFilters() {  // Reset all filters when you push the Reset Filters button
+
+    $('.filter_button').prop("checked", true);  // Re-check all 3 main checkboxes
+    $('.riskFilter').prop("checked", false);  // Uncheck all risk score checkboxes
+
+    resetSearch();
+    resetDate();
+    resetOverlay(); 
+    updateCount();  
+}
+    
+
+
+function resetSearch() { // Reset each dropdown menu
+   $('.chosen-select').val('').trigger('chosen:updated');
+   changing(); // Update dots
+}
+
+function resetDate() {  // Reset date sliders
+    $("#fire_slider").dateRangeSlider("values", new Date(2011, 0, 1), new Date(2016, 0, 1));
+    $("#insp_slider").dateRangeSlider("values", new Date(2012, 0, 1), new Date(2016, 0, 1));
+    changing();
+}
+
+function resetOverlay() { // Reset overlay radio buttons and overlay.
+       document.getElementById("radio1").checked = true;
+       overlay();
+       changing();       
+}
+
+
+
+function overlay() {  // This is the overlay radio box function
+
+    if (document.getElementById("radio1").checked == true) {
+       // console.log("You have selected Option 1");
+        g.selectAll("path")
+            .remove();
+        battalion = false;
+        NPU = false;
+        none = true; 
+        council = false;
+        drawDots(geojson);
+        drawOverlay();
+        updateCount();
+    }
+    else if (document.getElementById("radio2").checked == true) {
+       // console.log("You have selected Option 2");
+        g.selectAll("path")
+            .remove();
+        battalion = true;
+        NPU = false;
+        council = false
+        none = false;
+         drawOverlay();
+         drawDots(geojson);  
+         updateCount();
+   }
+    else if (document.getElementById("radio3").checked == true) {
+      //  console.log("You have selected Option 3");
+        g.selectAll("path")
+            .remove();
+        battalion = false;
+        council = false                
+        NPU = true;
+        none = false;
+         drawOverlay();
+         drawDots(geojson);
+         updateCount();
+   }
+   else if (document.getElementById("radio4").checked == true) {
+      //  console.log("You have selected Option 4");
+        g.selectAll("path")
+            .remove();
+        battalion = false;
+        NPU = false;
+        council = true;
+        none = false;
+        drawOverlay();
+        drawDots(geojson);
+         updateCount();
+   }
+    else {
+        // DO NOTHING
+    }
+}
+
+
+
+         
+        $(function() {  // Everything here runs on page load. Might work better with a document.ready function. 
+
+            function getPropertyInfo(){  // Runs the SQL_query.php file to query the SQL database and parse the geoJSON to use to draw the dots
+             
+                $.ajax({
+                    type: 'GET',
+                    url: 'SQL_query.php',
+                    data: '',
+                    dataType: 'json',
+                    cache: false,
+
+                    success: function(geojson) {
+                       // console.log(geojson);
+                        geojson = JSON.stringify(geojson);
+                        //console.log("String " + geojson);
+                        geojson = JSON.parse(geojson);
+                      //  console.log(geojson);
+                         drawDots(geojson);
+                         changing();
+                         return geojson;  // Draws all the dots - fire, inspection, potential
+                    },
+                 });
+
+            }
+           
+            geojson = getPropertyInfo(); 
+
+        
+ 
+            $("#reset").click(function (){   // Listens for clicks to reset button
+              //  console.log("resetting filters");
+                resetFilters();
+                
+            });
+
+            
+            $("#radio").click(function(){   // Listens for clicks to radio buttons
+                overlay();
+                changing();
+                 updateCount();  
+
+            });
+
+            resetDate();
+
+            $("#fire_slider").dateRangeSlider({  // Listens for changes to Date Range slider
+                bounds: {
+                    min: new Date(2011, 0, 1),
+                    max: new Date(2016, 0, 1)
+                },
+                defaultValues: {
+                    min: new Date(2011, 0, 1),
+                    max: new Date(2016, 0, 1)
+                },
+                step: {
+                    months: 1
+                },
+                arrows: false,
+                formatter: function (val) {
+                    var days = val.getDate(),
+                        month = val.getMonth() + 1,
+                        year = val.getFullYear();
+                    return month + "-" + year;
+                }
+            })
+            .bind("valuesChanging", function(e, data){
+                  //console.log("Values just changed. min: " + data.values.min + " max: " + data.values.max);
+                  changing(); 
+             updateCount();  
+
+            }); 
+
+
+             $("#insp_slider").dateRangeSlider({
+                bounds: {
+                    min: new Date(2012, 0, 1),
+                    max: new Date(2015, 0, 1)
+                },
+                defaultValues: {
+                    min: new Date(2012, 0, 1),
+                    max: new Date(2015, 0, 1)
+                },
+                step: {
+                    months: 1
+                },
+                arrows: false,
+                formatter: function (val) {
+                    var days = val.getDate(),
+                        month = val.getMonth() + 1,
+                        year = val.getFullYear();
+                    return month + "-" + year;
+                }
+            })
+            .bind("valuesChanging", function(e, data){
+                  //console.log("Values just changed. min: " + data.values.min + " max: " + data.values.max);
+                  changing(); 
+                   updateCount();  
+
+            }); 
+
+
+            $('.filter_button').change(function(){  // Listens for changes to main checkboxes (Fire/Inspection/Potential)
+                var val =[];
+                $('.filter_button:checked').each(function(i){
+                  val[i] = $(this).val();
+                });
+
+               // console.log("Checks: " + val);            
+                 changing();   
+                 updateCount();  
+            });
+
+
+            $( ".chosen-select" )  // Listens for changes to dropdowns
+                .change(changing())    
+                .change();
+                updateCount();  
+
+            });
+
+            $(".riskFilter").change(function() {   // Listens for changes to risk filter checkboxes
+                 var score =[];
+                $('.riskFilter:checked').each(function(i){
+                  //  $('#fire_button').prop("checked", false);
+                  score[i] = $(this).val();
+                });
+               changing(); 
+              updateCount();  
+ 
+             });
+
+
+
+// Initialize variables
+var total;
+var fires;
+var insp;
+var potential;
+var total_fires
+
+
+
+
+function changing() {  // Updates display based on filter selections
+                    
+    var val =[]; // Get values of checked boxes
+    $('.filter_button:checked').each(function(i){
+        val[i] = $(this).val();
+    });
+  //  console.log("Search bar sees checks as " + val);
+
+     var score =[];  // Get values of risk score filter
+    $('.riskFilter:checked').each(function(i){
+        score[i] = $(this).val();
+    });
+  //  console.log("Search sees checks as " + score);
+
+
+      // Get values of search bar 
+    var str1 = "";   // Fire search
+    $( "#property_usage_button option:selected" ).each(function() {
+        str1 += $( this ).text() + " ";
+    });
+   // console.log("Fire search bar is searching in " + val + " for: " + str1);
+
+    var str2 = "";  // Inspection search
+    $( "#occup_type_button option:selected" ).each(function() {
+        str2 += $( this ).text() + " ";
+    });
+   // console.log("Inspection search bar is searching in " + val + " for: " + str2);
+
+    var str3 = "";  // Potential search
+    $( "#sic_type_button option:selected" ).each(function() {
+        str3 += $( this ).text() + " ";
+    });
+   // console.log("Business search bar is searching in " + val + " for: " + str3);
+
+
+
+    //Convert the date values to min and max
+    var fire_dateValues = $("#fire_slider").dateRangeSlider("values");
+    var insp_dateValues = $("#insp_slider").dateRangeSlider("values");
+
+
+    var f_min_dateValues = moment(fire_dateValues.min);
+    var f_max_dateValues = moment(fire_dateValues.max);
+
+    var i_min_dateValues = moment(insp_dateValues.min);
+    var i_max_dateValues = moment(insp_dateValues.max);
+
+    //console.log("Filtering from " + min_dateValues + " to " + max_dateValues);
+
+
+
+
+    // Now display all, and only, the results of that search, IF that checkbox is checked. 
+    g.selectAll("circle")
+        .style("display", function(d, i) {
+
+
+            if (val.indexOf(d.properties.in_fsaf_yn) !== -1) {    // If the checkbox value is 1,0, or fire
+
+
+                if (d.properties.in_fsaf_yn == "fire") {  // For the fires:
+                    var fire_date = moment(d.properties.Incident_d, "MM/DD/YYYY"); 
+
+                    if (fire_date.isAfter(f_min_dateValues) && fire_date.isBefore(f_max_dateValues)) {  // Check for fire Date being within the date range
+                            
+                        //console.log(fire_date);
+                        //console.log(max_dateValues);
+
+                        if(str1 != "") {  // If there are no dropdown filters, display all
+                            if (str1.indexOf("NON-RESIDENTIAL") !== -1) {
+                                if(d.properties.Property_u != "1 OR 2 FAMILY DWELLING" && d.properties.Property_u != "MULTI-FAMILY DWELLINGS"){
+                                    return "block";
+                                } else {
+                                    return "none";
+                                }
+                            }
+                            if (str1.indexOf(d.properties.Property_u) !== -1) {  // If the dropdown filter matches the Property_u
+                                
+                                return "block"; // Display
+                                 
+                            } else {
+                                return "none";
+                            } // end search filter check
+                        } else {
+                            return "block";
+                        }  // end blank search filter check
+                    } else {
+                        return "none";
+                    }  // end time slider filter
+
+                } // if Fire is not checked, then don't display
+
+
+
+                if (d.properties.in_fsaf_yn == "1") {  // If it's an Inspection
+
+                    var insp_date = moment(d.properties.inspection_date, "MM/DD/YYYY");
+                    if (insp_date.isAfter(i_min_dateValues) && insp_date.isBefore(i_max_dateValues)) {  // Check for date range
+                        //console.log("It's a match!");
+                            //console.log(insp_date);
+                            //console.log(max_dateValues);
+                        if (str2 == "") {  // Display all if no dropdowns selected
+
+                            if (score != "") {  // Display all if no risk filters checked
+                                if(score.indexOf(d.properties.risk_category) !== -1) {   // If risk category is a match
+                                   return "block"; // Display
+                                } else {
+                                    return "none";
+                                }
+                            } else {
+                                return "block";  // This is the display for str2 == ""
+                            }
+
+                        } else if (str2.indexOf("LIQUOR LICENSE") !== -1) {  // Check if it's a Liquor License (this is because some Restaurants/Bars ALSO have Liq. License)
+                            if (d.properties.liq_id != "0") {
+
+                                if (score != "") {
+                                    if(score.indexOf(d.properties.risk_category) !== -1) {  // Filter by Risk score
+                                       return "block";
+                                    } else {
+                                        return "none";
+                                    }
+                                } else {
+                                    return "block";
+                                }
+                            } else {
+                                return "none";
+                            }
+                        }
+
+                            if (str2.indexOf(d.properties.occup_type) !== -1) {  // Filter by dropdown filter
+                                //console.log("found the type");
+                                if (score != "") {
+                                    if(score.indexOf(d.properties.risk_category) !== -1) { // Filter by risk
+                                       return "block";
+                                    } else {
+                                        return "none";
+                                    }
+                                } else {
+                                    return "block";
+                                }
+                            } else {
+                                return "none";
+                            } // end search filter check      
+                 
+                    } else {
+                        return "none";
+                    }  // end time slider filter
+                }  // End inspections
+                    
+
+                    
+               if (d.properties.in_fsaf_yn == "0") { // For all potentials:
+                    if (str3 == "") {    // If dropdown is blank, display all                        
+                        
+                        if (score != "") {
+                            if(score.indexOf(d.properties.risk_category) !== -1) {  // Filter by risk score
+                               return "block";
+                            } else {
+                                return "none";
+                            }
+                        } else {
+                            return "block";
+                        }
+
+                    } else if (str3.indexOf("LIQUOR LICENSE") !== -1) { // Filter all Liquor Licenses (for same reason as above)
+                            if (d.properties.liq_id != "0") {
+
+                                if (score != "") { // Risk scores unchecked - display all
+                                    if(score.indexOf(d.properties.risk_category) !== -1) { // Filter by risk score
+                                       return "block";
+                                    } else {
+                                        return "none";
+                                    }
+                                } else {
+                                    return "block";
+                                }
+
+                            } else {
+                                return "none";
+                            }
+                        }
+
+
+                        if (d.properties.new_prop_type != "NA") { // Filter dropdown by the property types
+                             if (str3.indexOf(d.properties.new_prop_type) !== -1) { // Filter by property type
+                                    if (score != "") {
+                                        if(score.indexOf(d.properties.risk_category) !== -1) { // Filter by risk score
+                                           return "block";
+                                        } else {
+                                            return "none";
+                                        }
+                                    } else {
+                                        return "block";
+                                    }
+
+                                } else {
+                                    return "none";
+                                }
+
+                        }  // End property type search 
+                } else {
+                    return;
+                } // End Potential Inspection filters 
+
+          } else {  // End checkbox search
+            return "none";
+          }
+        }) // End the .style display function
+
+
+        // Get totals       
+      total =  $('.circle').filter(function() {
+                    return $(this).css('display') !== 'none';
+                }).length; 
+
+     fires = $('.circle[fill="#AA3939"]').filter(function() {
+                    return $(this).css('display') !== 'none';
+                }).length;
+
+         insp = $('.circle[fill="#4CAF50"]').filter(function() {
+                    return $(this).css('display') !== 'none';
+                }).length;
+
+         potential = $('.circle[fill="#1F77B4"]').filter(function() {
+                    return $(this).css('display') !== 'none';
+                }).length;
+
+     updateCount();  // Update counts
+
+     total_fires = $('.circle[fill="#AA3939"]', '.circle[display="block"]').length; 
+
+} // End the changing() function
+    
+
+        
+
+
+ function applyLatLngToLayer(d) {  // This gets used in the drawDots() and drawOverlay() functions
+        var y = d.geometry.coordinates[1]  
+        var x = d.geometry.coordinates[0]
+        return map.latLngToLayerPoint(new L.LatLng(y, x))    // converts to SVG x/y
+        }
+
+
+
+
+var config = {  // This is for the dropdown menu UI widget
+  '.chosen-select'           : {},
+  '.chosen-select-deselect'  : {allow_single_deselect:true},
+  '.chosen-select-no-single' : {disable_search_threshold:10},
+  '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+  '.chosen-select-width'     : {width:"95%"}
+}
+for (var selector in config) {
+  $(selector).chosen(config[selector]);
+}
+
+
+</script>
+</body>
+</html>
