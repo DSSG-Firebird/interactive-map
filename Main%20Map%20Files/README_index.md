@@ -62,4 +62,4 @@ That’s the end! Thanks for reading! Explore the comments in the code, and chan
 
 <br><br><br><br>
 
-##### written by Oliver Haimson, with Michael Madaio, Xiang Cheng and Wenwen Zhang <br>on behalf of Data Science for Social Good, Atlanta<br> for Atlanta Fire Rescue Department
+##### written by Michael Madaio, with Xiang Cheng, Oliver Haimson, and Wenwen Zhang <br>on behalf of Data Science for Social Good, Atlanta<br> for Atlanta Fire Rescue Department
