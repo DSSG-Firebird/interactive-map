@@ -10,6 +10,8 @@ The Firebird framework is designed to help municipal fire departments:</br>
 More information on the Firebird project can be found <a href="http://www.firebird.gatech.edu">here</a>.
 
 ======
+
+## What
 Currently, the dropdownWriter.py file takes in a list of property types and converts them into an HTML list to be used for the dropdown menus on the map. 
 <br>Because each of those lists contains upwards of 100+ property types, it would have been quite tedious to type them out individually.
 
@@ -23,11 +25,12 @@ There is no need to run this script, UNLESS you plan on adding new property type
 3.	If there are new potential inspections with SIC codes not included in the dropdown.
  * That is, if you change the map from using the Property_list_short to using Property_list_long, there will definitely be new SIC codes used, and you will not be able to filter them on the map with the dropdown, unless they are included in the menu. 
 
-Be sure the change the .csv to the name of the file you are reading from. The default is set to Classification_types.csv, from the Property list folder. 
+### How
+1. Be sure the change the .csv to the name of the file you are reading from. The default is set to Classification_types.csv, from the Property list folder. 
 
-Change the index of the column (row[X]) to be whichever column you want to include. Remember that Python indices start at 0. 
+2. Change the index of the column (row[X]) to be whichever column you want to include. Remember that Python indices start at 0. 
 
-Then, copy all of the options in the output.html file, and paste them into the index.html to replace the dropdown options you want to replace.
+3. Then, copy all of the options in the output.html file, and paste them into the index.html to replace the dropdown options you want to replace.
 
 
 
