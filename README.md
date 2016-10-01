@@ -14,7 +14,7 @@ This repository has scripts to help you build an interactive map, using Mapbox a
 
 ======
 ## What:
-### The <a href="https://github.com/DSSG-Firebird/interactive-map/tree/master/Main%20Map%20Files">AFRD_Map folder</a> is the main website folder. 
+#### The <a href="https://github.com/DSSG-Firebird/interactive-map/tree/master/Main%20Map%20Files">AFRD_Map folder</a> is the main website folder. 
 * This is what you should upload to your website directory.
 
 
@@ -32,7 +32,7 @@ This repository has scripts to help you build an interactive map, using Mapbox a
 ________________________________________________________________
 
 
-### The <a href="https://github.com/DSSG-Firebird/interactive-map/tree/master/Misc.%20Map%20Files">Misc Map folder</a> contains miscellaneous map files
+#### The <a href="https://github.com/DSSG-Firebird/interactive-map/tree/master/Misc.%20Map%20Files">Misc Map folder</a> contains miscellaneous map files
 
 #### Files included in this folder:
 * <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Misc.%20Map%20Files/README_UpdatingMapData.md">READMEUpdatingMapData.md</a> - Explains how to create the back-end SQL server to host the map data on your server, and how to update that data to keep the map useful in the longer term.
@@ -42,7 +42,7 @@ ________________________________________________________________
 * AFRD_SQL_Columns  - This explains what each of the AFRD_SQL columns are.
 * Property_list_short.csv - This should be imported to your SQL server, into a table called “Current_And_Potential_Inspections” [so the SQL_query.php file can access it].
 	* __NOTE:__ This file is NOT in this folder, but you can generate your own version from your own data with the code in the property-joins Github repo. 
-
+<br><br>
 
 ## How:
 After you join your various property data sets (<a href="https://github.com/DSSG-Firebird/property-joins">Step 1</a>), and generate a fire risk score for each property (<a href="https://github.com/DSSG-Firebird/risk-model">Step 2</a>), you are ready to build your interactive map to visualize the fires and inspections.
