@@ -13,7 +13,7 @@ More information on the Firebird project can be found <a href="http://www.firebi
 This repository has scripts to help you build an interactive map, using Mapbox and D3, to visualize the property inspections and fires.
 
 ======
-
+## What:
 ### The <a href="https://github.com/DSSG-Firebird/interactive-map/tree/master/Main%20Map%20Files">AFRD_Map folder</a> is the main website folder. 
 * This is what you should upload to your website directory.
 
@@ -42,6 +42,15 @@ ________________________________________________________________
 * AFRD_SQL_Columns  - This explains what each of the AFRD_SQL columns are.
 * Property_list_short.csv - This should be imported to your SQL server, into a table called “Current_And_Potential_Inspections” [so the SQL_query.php file can access it].
 	* __NOTE:__ This file is NOT in this folder, but you can generate your own version from your own data with the code in the property-joins Github repo. 
+
+
+## How:
+After you join your various property data sets (<a href="https://github.com/DSSG-Firebird/property-joins">Step 1</a>), and generate a fire risk score for each property (<a href="https://github.com/DSSG-Firebird/risk-model">Step 2</a>), you are ready to build your interactive map to visualize the fires and inspections.
+
+1. First, upload your joined property data set to a SQL server, as explained <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Misc.%20Map%20Files/README_UpdatingMapData.md">here</a>.
+2. Then, create the appropriate SQL query for your database as explained <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Main%20Map%20Files/README_SQLquery.md">here</a>.
+3. Then, build the interactive map as explained <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Main%20Map%20Files/README_index.md">here</a>.
+4. If necessary, change the property types listed in the dropdown menus using the script, explained <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Misc.%20Map%20Files/README_dropdownWriter.md">here</a>.
 
 
 
