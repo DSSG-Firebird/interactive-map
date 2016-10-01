@@ -20,9 +20,9 @@ This repository has scripts to help you build an interactive map, using Mapbox a
 
 #### Files included in this folder:
 * index.html - This is the main map page, including the HTML, CSS, and Javascript to run the map.
-* README - index.html - Explains how to use the index.html file
+* <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Main%20Map%20Files/README_index.md">README_index.md</a> - Explains how to use the index.html file
 * SQL_query.php - This php file queries your SQL database to pull in information about the properties.
-* README - SQL_query.php - Explains how to use the SQL_query.php file
+* <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Main%20Map%20Files/README_SQLquery.md">README_SQLquery.md</a> - Explains how to use the SQL_query.php file
 * NPU.json - This is the json file for the NPU overlays.
 * Battalions.json - This is the json file for the Battalion overlays.
 * council_districts.json - This is the json file for the Council District overlays.
@@ -35,9 +35,9 @@ ________________________________________________________________
 ### The Misc Map folder contains miscellaneous map files
 
 #### Files included in this folder:
-* README - Updating the Map Data - Explains how to create the back-end SQL server to host the map data on your server, and how to update that data to keep the map useful in the longer term.
+* <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Misc.%20Map%20Files/README_UpdatingMapData.md">READMEUpdatingMapData.md</a> - Explains how to create the back-end SQL server to host the map data on your server, and how to update that data to keep the map useful in the longer term.
 * dropdownWriter.py - This Python script allows you to automatically create new dropdown menu lists, without typing out 100+ entries. Use this if you want to use the Property_list_long with all 190 FSAF types. 
-* README - dropdownWriter.py - Explains how to use the dropdownWriter.py file
+* <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Misc.%20Map%20Files/README_dropdownWriter.md">READMEdropdownWriter.md</a> - Explains how to use the dropdownWriter.py file
 * AFRD_SQL.csv - This should be imported to your SQL server, into a table called “Fire_Incidents” [so the SQL_query.php file can access it].
 * AFRD_SQL_Columns  - This explains what each of the AFRD_SQL columns are.
 * Property_list_short.csv - This should be imported to your SQL server, into a table called “Current_And_Potential_Inspections” [so the SQL_query.php file can access it].
