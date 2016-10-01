@@ -1,14 +1,19 @@
 #README for the Interactive Map HTML
 
-This will explain how the index.html file “works” to build the map. I recommend having that file open in your text editor of choice (I prefer Sublime Text), and following along, while reading the comments in the code. 
+This will explain how the index.html file “works” to build the map. I recommend having that file open in your text editor of choice and following along, while reading the comments in the code and modifying as necessary. 
 
+#### Live website editing
+Everyone has different approaches to editing their websites, but I prefer to have my code open Sublime Text, a text editor with syntax highlighting, and run a locally hosted server to view updates to the website live, using Python. More information <a href="https://docs.python.org/2/library/simplehttpserver.html">here</a>, but the short version is:
+* Open Terminal (on Mac)
+* Change directory to wherever your website files are: ("cd yourname/Documents/Firebird")
+* Type "python -m SimpleHTTPServer"
+* Open your web browser and type in the url: "localhost:8000"
+* Every time you make a change to your HTML in Sublime Text, save it and refresh the website.
 
-Hopefully you have at least a passing familiarity with HTML. 
-
-At the top of the file, you have the links and scripts for the external API’s, libraries, etc that we are using for the map. Then we have the css styles. 
 
 #### HTML
 Let’s start with the HTML construction. 
+* At the top of the file, you have the links and scripts for the external API’s, libraries, etc that we are using for the map. Then we have the css styles. 
 * We have a map div, which is our map. 
 * Then, a lengthy section of the “filter_options” div, which is the user interface for the filtering controls. 
 * Within here we have a div for each of the 3 main types (called “type_filter”, with an id for each type #fire_filter, etc). 
@@ -58,6 +63,9 @@ Finally, there is a series of functions to listen for events on the filter butto
 That’s the end! Thanks for reading! Explore the comments in the code, and change things, break things to find out how they work, and Google everything. There are tons of tutorials out there that explain how things like this work, and they helped me as I was writing it too. <br>
 
 <br>This can definitely be modified and improved in many, many ways, and I encourage you to find them, and fork the Github repo with your modifications and improvements.
+
+## Next
+Once you have your map
 
 
 <br><br><br><br>
