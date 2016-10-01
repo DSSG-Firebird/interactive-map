@@ -14,7 +14,7 @@ This repository has scripts to help you build an interactive map, using Mapbox a
 
 ======
 
-### The AFRD_Map folder is the main website folder. 
+### The <a href="https://github.com/DSSG-Firebird/interactive-map/tree/master/Main%20Map%20Files">AFRD_Map folder</a> is the main website folder. 
 * This is what you should upload to your website directory.
 
 
@@ -32,7 +32,7 @@ This repository has scripts to help you build an interactive map, using Mapbox a
 ________________________________________________________________
 
 
-### The Misc Map folder contains miscellaneous map files
+### The <a href="https://github.com/DSSG-Firebird/interactive-map/tree/master/Misc.%20Map%20Files">Misc Map folder</a> contains miscellaneous map files
 
 #### Files included in this folder:
 * <a href="https://github.com/DSSG-Firebird/interactive-map/blob/master/Misc.%20Map%20Files/README_UpdatingMapData.md">READMEUpdatingMapData.md</a> - Explains how to create the back-end SQL server to host the map data on your server, and how to update that data to keep the map useful in the longer term.
