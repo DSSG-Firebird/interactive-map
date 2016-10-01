@@ -7,6 +7,7 @@ Hopefully you have at least a passing familiarity with HTML.
 
 At the top of the file, you have the links and scripts for the external API’s, libraries, etc that we are using for the map. Then we have the css styles. 
 
+#### HTML
 Let’s start with the HTML construction. 
 * We have a map div, which is our map. 
 * Then, a lengthy section of the “filter_options” div, which is the user interface for the filtering controls. 
@@ -54,7 +55,9 @@ Finally, there is a series of functions to listen for events on the filter butto
 
 ========
 
-That’s the end! Thanks for reading! Explore the comments in the code, and change things, break things to find out how they work, and Google everything. There are tons of tutorials out there that explain how things like this work, and they helped me as I was writing it too. This can definitely be modified and improved in many, many ways, and I encourage you to find them, and fork the Github repo with your modifications and improvements.
+That’s the end! Thanks for reading! Explore the comments in the code, and change things, break things to find out how they work, and Google everything. There are tons of tutorials out there that explain how things like this work, and they helped me as I was writing it too. <br>
+
+<br>This can definitely be modified and improved in many, many ways, and I encourage you to find them, and fork the Github repo with your modifications and improvements.
 
 
 <br><br><br><br>
