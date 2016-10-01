@@ -25,7 +25,7 @@ There is no need to run this script, UNLESS you plan on adding new property type
 3.	If there are new potential inspections with SIC codes not included in the dropdown.
  * That is, if you change the map from using the Property_list_short to using Property_list_long, there will definitely be new SIC codes used, and you will not be able to filter them on the map with the dropdown, unless they are included in the menu. 
 
-### How
+## How
 1. Be sure the change the .csv to the name of the file you are reading from. The default is set to Classification_types.csv, from the Property list folder. 
 
 2. Change the index of the column (row[X]) to be whichever column you want to include. Remember that Python indices start at 0. 
