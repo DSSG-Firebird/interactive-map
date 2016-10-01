@@ -1,4 +1,15 @@
-#README for the Interactive Map HTML
+#Editing the Interactive Map
+
+The Firebird framework is designed to help municipal fire departments:</br>
+1. <a href="https://github.com/DSSG-Firebird/property-joins">Discover new properties for inspection</a><br>
+2. <a href="https://github.com/DSSG-Firebird/risk-model">Predict fire risk for properties and assign them a risk score
+</a><br>
+3. <a href="https://github.com/DSSG-Firebird/interactive-map">Visualize property inspections on an interactive map
+</a><br>
+
+More information on the Firebird project can be found <a href="http://www.firebird.gatech.edu">here</a>.
+
+======
 
 This will explain how the index.html file “works” to build the map. I recommend having that file open in your text editor of choice and following along, while reading the comments in the code and modifying as necessary. 
 
