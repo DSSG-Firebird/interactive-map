@@ -10,7 +10,7 @@ The Firebird framework is designed to help municipal fire departments:</br>
 
 More information on the Firebird project can be found <a href="http://www.firebird.gatech.edu">here</a>.
 
-This repository has scripts to help you build an interactive map, using Mapbox and D3, to visualize the property inspections and fires.
+This repository has scripts to help you build an interactive map, using Mapbox and D3, to visualize the property inspections and fires. Make sure you have completed the Property Joining process(<a href="https://github.com/DSSG-Firebird/property-joins">Step 1</a>) and build the Risk Model (<a href="https://github.com/DSSG-Firebird/risk-model">Step 2</a>) before building the Interactive Map.
 
 ======
 ## What:
