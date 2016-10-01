@@ -49,3 +49,9 @@ To update the map with new data:
 3. Click on “Empty the table”, or TRUNCATE to delete the entire CSV from the table. (Be sure you actually want to do this.)
 4. Import your updated CSV, being sure to skip the first line for headers.
 5. Refresh your Map site!
+
+
+<br><br><br><br>
+
+##### written by Michael Madaio, with Xiang Cheng, Oliver Haimson, and Wenwen Zhang <br>on behalf of Data Science for Social Good, Atlanta<br> for Atlanta Fire Rescue Department
+
