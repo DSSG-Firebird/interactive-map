@@ -75,9 +75,6 @@ That’s the end! Thanks for reading! Explore the comments in the code, and chan
 
 <br>This can definitely be modified and improved in many, many ways, and I encourage you to find them, and fork the Github repo with your modifications and improvements.
 
-## Next
-Once you have your map
-
 
 <br><br><br><br>
 
